@@ -9,7 +9,10 @@ ENTITY vga_top IS
         vga_green : OUT STD_LOGIC_VECTOR (2 DOWNTO 0);
         vga_blue  : OUT STD_LOGIC_VECTOR (1 DOWNTO 0);
         vga_hsync : OUT STD_LOGIC;
-        vga_vsync : OUT STD_LOGIC
+        vga_vsync : OUT STD_LOGIC;
+        --COPIED FROM LAB 4
+        KB_col : OUT STD_LOGIC_VECTOR (4 DOWNTO 1); -- keypad column pins
+	    KB_row : IN STD_LOGIC_VECTOR (4 DOWNTO 1) -- keypad row pins
     );
 END vga_top;
 
@@ -21,6 +24,22 @@ ARCHITECTURE Behavioral OF vga_top IS
     SIGNAL S_pixel_row, S_pixel_col : STD_LOGIC_VECTOR (10 DOWNTO 0);
     
     
+    --COPIED FROM LAB 4
+    COMPONENT keypad IS
+		PORT (
+			samp_ck : IN STD_LOGIC;
+			col : OUT STD_LOGIC_VECTOR (4 DOWNTO 1);
+			row : IN STD_LOGIC_VECTOR (4 DOWNTO 1);
+			value : OUT STD_LOGIC_VECTOR (3 DOWNTO 0);
+			hit : OUT STD_LOGIC
+		);
+	END COMPONENT;
+	SIGNAL cnt : std_logic_vector(20 DOWNTO 0); -- counter to generate timing signals
+	SIGNAL kp_clk, kp_hit, sm_clk : std_logic;
+	SIGNAL kp_value : std_logic_vector (3 DOWNTO 0);
+	
+	SIGNAL user_position: STD_LOGIC_VECTOR(3 DOWNTO 0);
+    
     
     
     COMPONENT game_board IS
@@ -30,7 +49,8 @@ ARCHITECTURE Behavioral OF vga_top IS
             pixel_col : IN STD_LOGIC_VECTOR(10 DOWNTO 0);
             red : OUT STD_LOGIC;
             green : OUT STD_LOGIC;
-            blue : OUT STD_LOGIC
+            blue : OUT STD_LOGIC;
+            user_val : IN STD_LOGIC_VECTOR(3 DOWNTO 0)
         );
     END COMPONENT;
     COMPONENT vga_sync IS
@@ -58,6 +78,15 @@ ARCHITECTURE Behavioral OF vga_top IS
     
     
 BEGIN
+    --COPIED FROM LAB 4
+    kp_clk <= cnt(15); -- keypad interrogation clock
+    kp1 : keypad
+	PORT MAP(
+		samp_ck => kp_clk, col => KB_col, 
+		row => KB_row, value => kp_value, hit => kp_hit
+    );
+
+
     -- vga_driver only drives MSB of red, green & blue
     -- so set other bits to zero
     vga_red(1 DOWNTO 0) <= "00";
@@ -72,7 +101,8 @@ BEGIN
         pixel_col => S_pixel_col, 
         red       => S_red, 
         green     => S_green, 
-        blue      => S_blue
+        blue      => S_blue,
+        user_val  => user_position
     );
 
     vga_driver : vga_sync
