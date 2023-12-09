@@ -11,7 +11,9 @@ ENTITY game_board IS
 		red       : OUT STD_LOGIC;
 		green     : OUT STD_LOGIC;
 		blue      : OUT STD_LOGIC;
-		user_val  : IN STD_LOGIC_VECTOR(3 DOWNTO 0)
+		user_val  : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
+		key_press : IN STD_LOGIC;
+		in_clock  : IN STD_LOGIC
 	);
 END game_board;
 
@@ -54,8 +56,9 @@ ARCHITECTURE Behavioral OF game_board IS
     type board_state is array(1 to 9) of state_type;
     SIGNAL board_status: board_state;
     
-    
-    SIGNAL try_pos: integer;
+    signal conv_user_val: integer;
+    signal lock_try_pos: integer := 1;
+    SIGNAL try_pos: integer := 1;
     SIGNAL try_state: state_type;
     
     SIGNAL attempt_test_x : integer;
@@ -86,7 +89,7 @@ ARCHITECTURE Behavioral OF game_board IS
 	
 	
 BEGIN
-    try_pos <= conv_integer(user_val);
+    
 
 
 
@@ -228,7 +231,74 @@ BEGIN
         
     END PROCESS;
     
-    b_status : PROCESS (board_status, try_pos, try_state) IS
+--    b_status_update : PROCESS(key_press, user_val, current_try_pos) IS
+--    BEGIN
+--        IF key_press = '1' THEN
+--            current_try_pos <= conv_integer(user_val);
+--        ELSE
+--            try_pos <= current_try_pos;
+--        END IF;
+--    END PROCESS;
+    
+--    b_lock : PROCESS(current_try_pos, try_pos) IS
+--    BEGIN
+--        IF current_try_pos /= try_pos THEN
+            
+--        END IF;
+--    END PROCESS;
+
+
+--    b_update_test : PROCESS(key_press, conv_user_val) IS
+--    BEGIN
+--        IF key_press = '1' THEN
+--            --try_pos <= 1
+--            try_pos <= conv_user_val;
+--        ELSE
+--            try_pos <= 5;
+--        END IF;
+--    END PROCESS;
+    
+--    b_integer : PROCESS(user_val) IS
+--    BEGIN
+--        conv_user_val <= conv_integer(user_val);
+--    END PROCESS;
+    
+--    b_update_test : PROCESS(conv_user_val) IS
+--    BEGIN
+--            try_pos <= conv_user_val;
+--    END PROCESS;
+    
+--    b_integer : PROCESS(user_val, key_press, try_pos) IS
+--    BEGIN
+--        IF key_press = '1' THEN
+--            conv_user_val <= conv_integer(user_val);
+--        ELSE
+--            conv_user_val <= try_pos;
+--        END IF;
+--    END PROCESS;
+    
+    b_integer : PROCESS(user_val) IS
+    BEGIN
+        conv_user_val <= conv_integer(user_val);
+    END PROCESS;
+    
+    
+    b_update_test : PROCESS(key_press, conv_user_val, in_clock) IS
+    BEGIN
+        IF rising_edge(in_clock) THEN
+            IF key_press = '1' THEN
+                --try_pos <= 1
+                IF conv_user_val > 0 and conv_user_val < 10 THEN
+                    try_pos <= conv_user_val;
+                END IF;
+--            ELSE
+--                try_pos <= 5;
+            END IF;
+		END IF;
+    END PROCESS;
+    
+    
+    b_status : PROCESS (board_status, try_state, user_val) IS
 	BEGIN
        board_status(1) <= O;
        board_status(2) <= X;
@@ -240,7 +310,7 @@ BEGIN
        board_status(8) <= O;
        board_status(9) <= X;
        
-       --try_pos <= 5;
+
        try_state <= X;
     END PROCESS;
     

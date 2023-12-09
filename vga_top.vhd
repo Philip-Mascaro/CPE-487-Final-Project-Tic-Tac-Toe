@@ -12,7 +12,7 @@ ENTITY vga_top IS
         vga_vsync : OUT STD_LOGIC;
         --COPIED FROM LAB 4
         KB_col : OUT STD_LOGIC_VECTOR (4 DOWNTO 1); -- keypad column pins
-	    KB_row : IN STD_LOGIC_VECTOR (4 DOWNTO 1) -- keypad row pins
+        KB_row : IN STD_LOGIC_VECTOR (4 DOWNTO 1) -- keypad row pins
     );
 END vga_top;
 
@@ -37,8 +37,6 @@ ARCHITECTURE Behavioral OF vga_top IS
 	SIGNAL cnt : std_logic_vector(20 DOWNTO 0); -- counter to generate timing signals
 	SIGNAL kp_clk, kp_hit, sm_clk : std_logic;
 	SIGNAL kp_value : std_logic_vector (3 DOWNTO 0);
-	
-	SIGNAL user_position: STD_LOGIC_VECTOR(3 DOWNTO 0);
     
     
     
@@ -50,7 +48,9 @@ ARCHITECTURE Behavioral OF vga_top IS
             red : OUT STD_LOGIC;
             green : OUT STD_LOGIC;
             blue : OUT STD_LOGIC;
-            user_val : IN STD_LOGIC_VECTOR(3 DOWNTO 0)
+            user_val : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
+            key_press : IN STD_LOGIC;
+            in_clock: IN STD_LOGIC
         );
     END COMPONENT;
     COMPONENT vga_sync IS
@@ -79,6 +79,12 @@ ARCHITECTURE Behavioral OF vga_top IS
     
 BEGIN
     --COPIED FROM LAB 4
+    ck_proc : PROCESS (clk_in)
+	BEGIN
+		IF rising_edge(clk_in) THEN -- on rising edge of clock
+			cnt <= cnt + 1; -- increment counter
+		END IF;
+	END PROCESS;
     kp_clk <= cnt(15); -- keypad interrogation clock
     kp1 : keypad
 	PORT MAP(
@@ -102,7 +108,9 @@ BEGIN
         red       => S_red, 
         green     => S_green, 
         blue      => S_blue,
-        user_val  => user_position
+        user_val  => kp_value,
+        key_press => kp_hit,
+        in_clock  => clk_in
     );
 
     vga_driver : vga_sync
