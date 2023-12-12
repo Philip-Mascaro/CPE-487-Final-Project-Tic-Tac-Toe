@@ -56,6 +56,9 @@ ARCHITECTURE Behavioral OF game_board IS
     type board_state is array(1 to 9) of state_type;
     SIGNAL board_status: board_state;
     
+    type color_type is (PIX_BLACK, PIX_RED, PIX_GREEN, PIX_BLUE, PIX_YELLOW, PIX_PINK, PIX_CYAN, PIX_WHITE);
+    SIGNAL mycolor : color_type;
+    
     signal conv_user_val: integer;
     signal lock_try_pos: integer := 1;
     SIGNAL try_pos: integer := 1;
@@ -81,6 +84,7 @@ ARCHITECTURE Behavioral OF game_board IS
     
     SIGNAL valid_move: STD_LOGIC;
     
+    SIGNAL blink_counter : STD_LOGIC_VECTOR(31 DOWNTO 0);
 
 	
 	
@@ -282,6 +286,12 @@ BEGIN
         conv_user_val <= conv_integer(user_val);
     END PROCESS;
     
+    b_counter : PROCESS (blink_counter) IS
+    BEGIN
+        IF rising_edge(in_clock) THEN
+            blink_counter <= blink_counter + 1;
+        END IF;
+    END PROCESS;
     
     b_update_test : PROCESS(key_press, conv_user_val, in_clock) IS
     BEGIN
@@ -331,28 +341,45 @@ BEGIN
         
         IF (attempt_pixel_on = '0') THEN
             IF (pixel_on = '0') THEN
-                red <= '1';
-                green <= '1';
-                blue  <= '1';
+                mycolor <= PIX_WHITE;
             ELSE
-                red <= '0';
-                green <= '0';
-                blue  <= '0';
+                mycolor <= PIX_BLACK;
             END IF;
         ELSE
             IF valid_move = '1' THEN
-                red <= '0';
-                green <= '1';
-                blue  <= '0';
+                IF blink_counter(25) = '1' THEN
+                    mycolor <= PIX_BLUE;
+                ELSE
+                    IF (pixel_on = '0') THEN
+                    mycolor <= PIX_WHITE;
+                    ELSE
+                        mycolor <= PIX_BLACK;
+                    END IF;
+                END IF;
             ELSE
-                red <= '1';
-                green <= '0';
-                blue  <= '0';
+                IF blink_counter(25) = '1' THEN
+                    mycolor <= PIX_RED;
+                ELSE
+                    IF (pixel_on = '0') THEN
+                    mycolor <= PIX_WHITE;
+                    ELSE
+                        mycolor <= PIX_BLACK;
+                    END IF;
+                END IF;
             END IF;
         END IF;
     END PROCESS;
         
-        
+    --REFERENCE:  https://stackoverflow.com/questions/27864903/with-select-statement-with-multiple-conditions-vhdl
+    WITH mycolor SELECT
+        red <= '1' when PIX_RED | PIX_PINK | PIX_YELLOW | PIX_WHITE,
+               '0' when others;
+    WITH mycolor SELECT
+        green <= '1' when PIX_GREEN | PIX_CYAN | PIX_YELLOW | PIX_WHITE,
+                 '0' when others;
+    WITH mycolor SELECT
+        blue <= '1' when PIX_BLUE | PIX_CYAN | PIX_PINK | PIX_WHITE,
+                '0' when others;
         
         
 END Behavioral;
