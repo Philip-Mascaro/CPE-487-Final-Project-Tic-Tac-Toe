@@ -94,9 +94,9 @@ ARCHITECTURE Behavioral OF game_board IS
 
 	SIGNAL i_won : STD_LOGIC;	
 BEGIN
-    update_board_process: PROCESS (kp_value, board_status, try_pos, try_state)
+    update_board_process: PROCESS (user_value, board_status, try_pos, try_state)
 BEGIN
-    IF kp_value = "1101" THEN  -- press D key
+    IF user_value = "1101" THEN  -- press D key
         IF board_status(conv_integer(try_pos)) = E THEN  -- state not taken yet
             -- Confirm the move and update the board
             board_status(conv_integer(try_pos)) <= try_state;
