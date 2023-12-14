@@ -60,8 +60,7 @@ ARCHITECTURE Behavioral OF game_board IS
     SIGNAL mycolor : color_type;
     
     signal conv_user_val: integer;
-    signal lock_try_pos: integer := 1;
-    SIGNAL try_pos: integer := 1;
+    SIGNAL try_pos: integer := 5;
     SIGNAL try_state: state_type := X;
     
     SIGNAL attempt_test_x : integer;
@@ -86,7 +85,7 @@ ARCHITECTURE Behavioral OF game_board IS
     
     SIGNAL blink_counter : STD_LOGIC_VECTOR(31 DOWNTO 0);
 
-    SIGNAL i_won : STD_LOGIC;
+    SIGNAL i_won : STD_LOGIC_VECTOR(1 TO 9) := "000000000";
 	SIGNAL winner : state_type := E;
 	SIGNAL game_won : INTEGER := 0;
 	SIGNAL win_positions_row : STD_LOGIC_VECTOR(1 TO 9) := "000000000";
@@ -347,7 +346,7 @@ BEGIN
         END IF;
     END PROCESS;
     
-    b_set_board: PROCESS (pixel_on, valid_move, attempt_pixel_on, game_won) IS
+    b_set_board: PROCESS (pixel_on, valid_move, attempt_pixel_on, game_won, i_won) IS
     BEGIN
         IF (game_won = 0) THEN
             IF (attempt_pixel_on = '0') THEN
@@ -386,10 +385,14 @@ BEGIN
                 IF (game_won = 2) THEN
                     mycolor <= PIX_YELLOW;
                 ELSE
-                    IF (i_won = '1') THEN
+                    IF (i_won /= "000000000") THEN
                         mycolor <= PIX_GREEN;
                     ELSE
-                        mycolor <= PIX_BLACK;
+                        IF (pixel_on = '0') THEN
+                            mycolor <= PIX_WHITE;
+                        ELSE
+                            mycolor <= PIX_BLACK;
+                        END IF;
                     END IF;
                 END IF;
             END IF;
@@ -412,7 +415,7 @@ BEGIN
             END IF;
 
         -- Check rows
-            IF (board_status(3*(i-1)+1) = board_status(3*(i-1)+2) AND board_status(3*(i-1)+2) = board_status(3*(i-1)+3) AND board_status(i) /= E) THEN
+            IF (board_status(3*(i-1)+1) = board_status(3*(i-1)+2) AND board_status(3*(i-1)+2) = board_status(3*(i-1)+3) AND board_status(3*(i-1)+1) /= E) THEN
                 winner <= board_status(i);
                 win_positions_row(3*(i-1)+1) <= '1';
                 win_positions_row(3*(i-1)+2) <= '1';
@@ -447,13 +450,16 @@ BEGIN
         --pixel_on_9 states which of the 9 play positions this pixel might be a part of
         --win_positions states which positions are winners
         --check if this pixel’s position is one of the winners
-        for index in 1 to 9 loop
-            IF (pixel_on_9(index) = win_positions(index) AND pixel_on_9(index) = '1') THEN
-                i_won <= '1';
-            ELSE
-                i_won <= '0';
-            END IF;
-        end loop;
+        
+--        for index in 1 to 9 loop
+--            IF (pixel_on_9(index) = win_positions(index) AND pixel_on_9(index) = '1') THEN
+--                i_won <= '1';
+--            ELSE
+--                i_won <= '0';
+--            END IF;
+--        end loop;
+        
+        i_won <= pixel_on_9 AND win_positions; -- if i_won is all 0, either blakc or white, otherwise green
     END PROCESS;
     
     
