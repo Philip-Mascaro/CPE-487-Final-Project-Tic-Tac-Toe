@@ -92,9 +92,9 @@ ARCHITECTURE Behavioral OF game_board IS
 
     SIGNAL player1_turn, player2_turn : BOOLEAN := TRUE;
 
-	SIGNAL i_won : STD_LOGIC;
-
-update_board_process: PROCESS (kp_value, board_status, try_pos, try_state)
+	SIGNAL i_won : STD_LOGIC;	
+BEGIN
+    update_board_process: PROCESS (kp_value, board_status, try_pos, try_state)
 BEGIN
     IF kp_value = "1101" THEN  -- press D key
         IF board_status(conv_integer(try_pos)) = E THEN  -- state not taken yet
@@ -113,12 +113,6 @@ BEGIN
     END IF;
 END PROCESS update_board_process;
 	
-	
-	
-	
-	
-BEGIN
-    
 
 
 
