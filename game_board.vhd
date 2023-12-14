@@ -424,6 +424,20 @@ BEGIN
         END IF;
     END PROCESS;
 
+	b_am_i_a_winner: PROCESS(win_positions, pixel_on_9) IS
+BEGIN
+	--pixel_on_9 states which of the 9 play positions this pixel might be a part of
+	--win_positions states which positions are winners
+	--check if this pixel’s position is one of the winners
+	for index in 1 to 9 loop
+		IF (pixel_on_9(index) = win_positions(index) AND pixel_on_9(index) = ‘1’) THEN
+			i_won <= ‘1’;
+		ELSE
+			i_won <= ‘0’;
+		END IF;
+	end loop;
+END PROCESS;
+
     --REFERENCE:  https://stackoverflow.com/questions/27864903/with-select-statement-with-multiple-conditions-vhdl
     WITH mycolor SELECT
         red <= '1' when PIX_RED | PIX_PINK | PIX_YELLOW | PIX_WHITE,
