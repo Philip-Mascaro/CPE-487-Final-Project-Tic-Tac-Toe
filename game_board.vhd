@@ -28,6 +28,10 @@ ARCHITECTURE Behavioral OF game_board IS
 	SIGNAL screen_center_y  : STD_LOGIC_VECTOR(10 DOWNTO 0) := CONV_STD_LOGIC_VECTOR(300, 11);
 	-- current ball motion - initialized to +4 pixels/frame
 	--SIGNAL ball_y_motion : STD_LOGIC_VECTOR(10 DOWNTO 0) := -"00000000100";
+	SIGNAL winner : state_type := E;
+	SIGNAL game_won : STD_LOGIC := ‘0’;
+	SIGNAL win_positions : STD_LOGIC_VECTOR(1 TO 9) := “000000000”;
+
 	
 	--REFERENCE:  https://www.edaboard.com/threads/using-integer-arrays-in-vhdl.132696/
 	type int_array is array(1 to 9) of integer;
@@ -51,8 +55,8 @@ ARCHITECTURE Behavioral OF game_board IS
     SIGNAL board_col: int_array;
     SIGNAL board_row: int_array;
     SIGNAL pixel_on_9: STD_LOGIC_VECTOR(1 TO 9);
-    
-    type state_type is (X, O, E); --X, O, and Empty
+
+    type state_type is (X, O, E, DRAW);
     type board_state is array(1 to 9) of state_type;
     SIGNAL board_status: board_state;
     
