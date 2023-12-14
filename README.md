@@ -1,6 +1,6 @@
 # CPE-487-Final-Project-Tic-Tac-Toe
 
-* Program the FPGA to display a "bouncing ball" on a 800x600 [Video Graphics Array](https://en.wikipedia.org/wiki/Video_Graphics_Array) (VGA) monitor (See Section 8 on VGA Port and Subsection 8.1 on VGA System Timing of the [Reference Manual]( https://reference.digilentinc.com/_media/reference/programmable-logic/nexys-a7/nexys-a7_rm.pdf))
+* Program the FPGA to display a Tic-Tac-Toe Game.
   * The Digilent Nexys A7-100T board has a female [VGA connector](https://en.wikipedia.org/wiki/VGA_connector) that can be connected to a VGA monitor via a VGA cable or a [High-Definition Multimedia Interface](https://en.wikipedia.org/wiki/HDMI) (HDMI) monitor via a [VGA-to-HDMI converter](https://www.ventioncable.com/product/vga-to-hdmi-converter/) with a [micro-B USB](https://en.wikipedia.org/wiki/USB_hardware) power supply.
   * [VGA video](https://web.mit.edu/6.111/www/s2004/NEWKIT/vga.shtml) uses separate wires to transmit the three color component signals and vertical and horizontal synchronization signals.
   * [Horizontal blanking interval](https://en.wikipedia.org/wiki/Horizontal_blanking_interval) consists of front porch, sync pulse, and back porch.
@@ -19,7 +19,7 @@
   * Note that red, green, and blue video are each represented as 1-bit (on-off) quantities.
   * This is sufficient resolution for our application.
 
-* The **_ball_** module will be used to generate the red, green, and blue video that will paint the ball on to the VGA display at its current position.
+* The **_game_** module will be used to generate the red, green, and blue video that will paint the ball on to the VGA display at its current position.
   * This module maintains signals ball_x and ball_y that represent the current position of the ball on the screen.
   * These are initialized to (400, 300) to start the ball in the center of the screen.
   * The module also maintains a signal ball_y_motion that represents the number of pixels that the ball should move in one frame period.
