@@ -91,7 +91,9 @@ ARCHITECTURE Behavioral OF game_board IS
     SIGNAL blink_counter : STD_LOGIC_VECTOR(31 DOWNTO 0);
 
     SIGNAL player1_turn, player2_turn : BOOLEAN := TRUE;
-	
+
+	SIGNAL i_won : STD_LOGIC;
+
 update_board_process: PROCESS (kp_value, board_status, try_pos, try_state)
 BEGIN
     IF kp_value = "1101" THEN  -- press D key
