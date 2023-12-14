@@ -28,10 +28,6 @@ ARCHITECTURE Behavioral OF game_board IS
 	SIGNAL screen_center_y  : STD_LOGIC_VECTOR(10 DOWNTO 0) := CONV_STD_LOGIC_VECTOR(300, 11);
 	-- current ball motion - initialized to +4 pixels/frame
 	--SIGNAL ball_y_motion : STD_LOGIC_VECTOR(10 DOWNTO 0) := -"00000000100";
-	SIGNAL winner : state_type := E;
-	SIGNAL game_won : STD_LOGIC := ‘0’;
-	SIGNAL win_positions : STD_LOGIC_VECTOR(1 TO 9) := “000000000”;
-
 	
 	--REFERENCE:  https://www.edaboard.com/threads/using-integer-arrays-in-vhdl.132696/
 	type int_array is array(1 to 9) of integer;
@@ -55,10 +51,10 @@ ARCHITECTURE Behavioral OF game_board IS
     SIGNAL board_col: int_array;
     SIGNAL board_row: int_array;
     SIGNAL pixel_on_9: STD_LOGIC_VECTOR(1 TO 9);
-
-    type state_type is (X, O, E, DRAW);
+    
+    type state_type is (X, O, E); --X, O, and Empty
     type board_state is array(1 to 9) of state_type;
-    SIGNAL board_status: board_state;
+    SIGNAL board_status: board_state := (E,E,E,E,E,E,E,E,E);--(O,X,E,O,E,X,E,O,X);
     
     type color_type is (PIX_BLACK, PIX_RED, PIX_GREEN, PIX_BLUE, PIX_YELLOW, PIX_PINK, PIX_CYAN, PIX_WHITE);
     SIGNAL mycolor : color_type;
@@ -66,7 +62,7 @@ ARCHITECTURE Behavioral OF game_board IS
     signal conv_user_val: integer;
     signal lock_try_pos: integer := 1;
     SIGNAL try_pos: integer := 1;
-    SIGNAL try_state: state_type;
+    SIGNAL try_state: state_type := X;
     
     SIGNAL attempt_test_x : integer;
     SIGNAL attempt_test_y : integer;
@@ -90,29 +86,26 @@ ARCHITECTURE Behavioral OF game_board IS
     
     SIGNAL blink_counter : STD_LOGIC_VECTOR(31 DOWNTO 0);
 
-    SIGNAL player1_turn, player2_turn : BOOLEAN := TRUE;
-
-	SIGNAL i_won : STD_LOGIC;	
-BEGIN
-    update_board_process: PROCESS (user_value, board_status, try_pos, try_state)
-BEGIN
-    IF user_value = "1101" THEN  -- press D key
-        IF board_status(try_pos) = E THEN  -- state not taken yet
-            -- Confirm the move and update the board
-            board_status(try_pos) <= try_state;
-
-            -- Switch player turns
-            IF player1_turn THEN
-                player1_turn <= FALSE;
-                player2_turn <= TRUE;
-            ELSE
-                player1_turn <= TRUE;
-                player2_turn <= FALSE;
-            END IF;
-        END IF;
-    END IF;
-END PROCESS update_board_process;
+    SIGNAL i_won : STD_LOGIC;
+	SIGNAL winner : state_type := E;
+	SIGNAL game_won : INTEGER := 0;
+	SIGNAL win_positions_row : STD_LOGIC_VECTOR(1 TO 9) := "000000000";
+	SIGNAL win_positions_col : STD_LOGIC_VECTOR(1 TO 9) := "000000000";
+	SIGNAL win_positions_diag1 : STD_LOGIC_VECTOR(1 TO 9) := "000000000";
+	SIGNAL win_positions_diag2 : STD_LOGIC_VECTOR(1 TO 9) := "000000000";
+	SIGNAL win_positions : STD_LOGIC_VECTOR(1 TO 9) := "000000000";
 	
+	SIGNAL player1_turn, player2_turn : BOOLEAN := TRUE;
+	
+	
+   
+   
+
+   
+	
+	
+BEGIN
+    
 
 
 
@@ -151,7 +144,6 @@ END PROCESS update_board_process;
        board_row(7) <= 1;
        board_row(8) <= 1;
        board_row(9) <= 1;
-       
        
        
        
@@ -327,21 +319,21 @@ END PROCESS update_board_process;
     END PROCESS;
     
     
-    b_status : PROCESS (board_status, try_state, user_val) IS
-	BEGIN
-       board_status(1) <= O;
-       board_status(2) <= X;
-       board_status(3) <= E;
-       board_status(4) <= O;
-       board_status(5) <= E;
-       board_status(6) <= X;
-       board_status(7) <= E;
-       board_status(8) <= O;
-       board_status(9) <= X;
-       
+--    b_status : PROCESS (board_status, try_state, user_val) IS
+--	BEGIN
+--       board_status(1) <= O;
+--       board_status(2) <= X;
+--       board_status(3) <= E;
+--       board_status(4) <= O;
+--       board_status(5) <= E;
+--       board_status(6) <= X;
+--       board_status(7) <= E;
+--       board_status(8) <= O;
+--       board_status(9) <= X;
 
-       try_state <= X;
-    END PROCESS;
+--       try_state <= X;
+       
+--    END PROCESS;
     
     b_attempt: PROCESS (board_status, try_pos, try_state, pixel_on, valid_move) IS
     BEGIN
@@ -355,32 +347,47 @@ END PROCESS update_board_process;
         END IF;
     END PROCESS;
     
-    b_set_board: PROCESS (pixel_on, valid_move, attempt_pixel_on) IS
+    b_set_board: PROCESS (pixel_on, valid_move, attempt_pixel_on, game_won) IS
     BEGIN
-        
-        IF (attempt_pixel_on = '0') THEN
+        IF (game_won = 0) THEN
+            IF (attempt_pixel_on = '0') THEN
+                IF (pixel_on = '0') THEN
+                    mycolor <= PIX_WHITE;
+                ELSE
+                    mycolor <= PIX_BLACK;
+                END IF;
+            ELSE
+                IF valid_move = '1' THEN
+                    IF blink_counter(25) = '1' THEN
+                        mycolor <= PIX_BLUE;
+                    ELSE
+                        IF (pixel_on = '0') THEN
+                            mycolor <= PIX_WHITE;
+                        ELSE
+                            mycolor <= PIX_BLACK;
+                        END IF;
+                    END IF;
+                ELSE
+                    IF blink_counter(25) = '1' THEN
+                        mycolor <= PIX_RED;
+                    ELSE
+                        IF (pixel_on = '0') THEN
+                            mycolor <= PIX_WHITE;
+                        ELSE
+                            mycolor <= PIX_BLACK;
+                        END IF;
+                    END IF;
+                END IF;
+            END IF;
+        ELSE
             IF (pixel_on = '0') THEN
                 mycolor <= PIX_WHITE;
             ELSE
-                mycolor <= PIX_BLACK;
-            END IF;
-        ELSE
-            IF valid_move = '1' THEN
-                IF blink_counter(25) = '1' THEN
-                    mycolor <= PIX_BLUE;
+                IF (game_won = 2) THEN
+                    mycolor <= PIX_YELLOW;
                 ELSE
-                    IF (pixel_on = '0') THEN
-                    mycolor <= PIX_WHITE;
-                    ELSE
-                        mycolor <= PIX_BLACK;
-                    END IF;
-                END IF;
-            ELSE
-                IF blink_counter(25) = '1' THEN
-                    mycolor <= PIX_RED;
-                ELSE
-                    IF (pixel_on = '0') THEN
-                    mycolor <= PIX_WHITE;
+                    IF (i_won = '1') THEN
+                        mycolor <= PIX_GREEN;
                     ELSE
                         mycolor <= PIX_BLACK;
                     END IF;
@@ -388,71 +395,92 @@ END PROCESS update_board_process;
             END IF;
         END IF;
     END PROCESS;
-	--win check
-	b_win_check: PROCESS (board_status, try_pos, try_state, pixel_on, valid_move) IS
+    
+    --win check
+	b_win_check: PROCESS (board_status, try_pos, try_state, pixel_on, valid_move, blink_counter) IS
     BEGIN
-        IF (attempt_pixel_on = '1') THEN
-            IF board_status(try_pos) = E THEN
-                valid_move <= '1';
-                -- Make the move
-                board_status(try_pos) <= try_state;
                 
                 -- Check for winning conditions
    FOR i IN 1 TO 3 LOOP
         -- Check cols
-        IF (board_status(i) = board_status(i + 3) AND board_status(i + 3) = board_status(i + 6) AND board_status(i) /= E) THEN
-            winner <= board_status(i);
-            win_positions(i) <= ‘1’;
-            win_positions(i+3) <= ‘1’;
-            win_positions(i+6) <= ‘1’;
-            game_won <= ‘1’;
-        END IF;
+            IF (board_status(i) = board_status(i + 3) AND board_status(i + 3) = board_status(i + 6) AND board_status(i) /= E) THEN
+                winner <= board_status(i);
+                win_positions_col(i) <= '1';
+                win_positions_col(i+3) <= '1';
+                win_positions_col(i+6) <= '1';
+                game_won <= 1;
+            END IF;
 
         -- Check rows
-        IF (board_status(3*(i-1)+1) = board_status(3*(i-1)+2) AND board_status(3*(i-1)+2) = board_status(3*(i-1)+3) AND board_status(i) /= E) THEN
-            winner <= board_status(i);
-            win_positions(3*(i-1)+1) <= ‘1’;
-            win_positions(3*(i-1)+2) <= ‘1’;
-            win_positions(3*(i-1)+3) <= ‘1’;
-            game_won <= ‘1’;
-        END IF;
-    END FOR;
+            IF (board_status(3*(i-1)+1) = board_status(3*(i-1)+2) AND board_status(3*(i-1)+2) = board_status(3*(i-1)+3) AND board_status(i) /= E) THEN
+                winner <= board_status(i);
+                win_positions_row(3*(i-1)+1) <= '1';
+                win_positions_row(3*(i-1)+2) <= '1';
+                win_positions_row(3*(i-1)+3) <= '1';
+                game_won <= 1;
+            END IF;
+    END loop;
 
     -- Check diagonals
-    IF (board_status(1) = board_status(5) AND board_status(5) = board_status(9) AND board_status(1) /= E) THEN
-        winner <= board_status(1);
-            win_positions(1) <= ‘1’;
-            win_positions(5) <= ‘1’;
-            win_positions(9) <= ‘1’;
-            game_won <= ‘1’;
-    END IF;
-    IF (board_status(3) = board_status(5) AND board_status(5) = board_status(7) AND board_status(3) /= E) THEN
-        winner <= board_status(3);
-            win_positions(3) <= ‘1’;
-            win_positions(5) <= ‘1’;
-            win_positions(7) <= ‘1’;
-            game_won <= ‘1’;
-    END IF;
-            ELSE
-                valid_move <= '0';
-            END IF;
+        IF (board_status(1) = board_status(5) AND board_status(5) = board_status(9) AND board_status(1) /= E) THEN
+            winner <= board_status(1);
+                win_positions_diag1(1) <= '1';
+                win_positions_diag1(5) <= '1';
+                win_positions_diag1(9) <= '1';
+                game_won <= 1;
         END IF;
+    
+        IF (board_status(3) = board_status(5) AND board_status(5) = board_status(7) AND board_status(3) /= E) THEN
+            winner <= board_status(3);
+                win_positions_diag2(3) <= '1';
+                win_positions_diag2(5) <= '1';
+                win_positions_diag2(7) <= '1';
+                game_won <= 1;
+        END IF;
+
+    win_positions <= (win_positions_col or win_positions_row) or (win_positions_diag1 or win_positions_diag2);
+
     END PROCESS;
 
 	b_am_i_a_winner: PROCESS(win_positions, pixel_on_9) IS
-BEGIN
-	--pixel_on_9 states which of the 9 play positions this pixel might be a part of
-	--win_positions states which positions are winners
-	--check if this pixel’s position is one of the winners
-	for index in 1 to 9 loop
-		IF (pixel_on_9(index) = win_positions(index) AND pixel_on_9(index) = ‘1’) THEN
-			i_won <= ‘1’;
-		ELSE
-			i_won <= ‘0’;
-		END IF;
-	end loop;
-END PROCESS;
-
+    BEGIN
+        --pixel_on_9 states which of the 9 play positions this pixel might be a part of
+        --win_positions states which positions are winners
+        --check if this pixel�s position is one of the winners
+        for index in 1 to 9 loop
+            IF (pixel_on_9(index) = win_positions(index) AND pixel_on_9(index) = '1') THEN
+                i_won <= '1';
+            ELSE
+                i_won <= '0';
+            END IF;
+        end loop;
+    END PROCESS;
+    
+    
+	
+    update_board_process: PROCESS (user_val, board_status, try_pos, try_state, in_clock, key_press)
+    BEGIN
+        IF rising_edge(in_clock) THEN
+            IF key_press = '1' THEN
+                IF user_val = "1101" AND game_won = 0 THEN  -- press D key
+                    IF board_status(try_pos) = E THEN  -- state not taken yet
+                        -- Confirm the move and update the board
+                        board_status(try_pos) <= try_state;
+            
+                        -- Switch player turns
+                        IF player1_turn THEN
+                            player1_turn <= FALSE;
+                            player2_turn <= TRUE;
+                        ELSE
+                            player1_turn <= TRUE;
+                            player2_turn <= FALSE;
+                        END IF;
+                    END IF;
+                END IF;
+            END IF;
+        END IF;
+    END PROCESS update_board_process;
+    
     --REFERENCE:  https://stackoverflow.com/questions/27864903/with-select-statement-with-multiple-conditions-vhdl
     WITH mycolor SELECT
         red <= '1' when PIX_RED | PIX_PINK | PIX_YELLOW | PIX_WHITE,
