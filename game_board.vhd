@@ -369,7 +369,57 @@ BEGIN
             END IF;
         END IF;
     END PROCESS;
-        
+	--win check
+	b_win_check: PROCESS (board_status, try_pos, try_state, pixel_on, valid_move) IS
+    BEGIN
+        IF (attempt_pixel_on = '1') THEN
+            IF board_status(try_pos) = E THEN
+                valid_move <= '1';
+                -- Make the move
+                board_status(try_pos) <= try_state;
+                
+                -- Check for winning conditions
+   FOR i IN 1 TO 3 LOOP
+        -- Check cols
+        IF (board_status(i) = board_status(i + 3) AND board_status(i + 3) = board_status(i + 6) AND board_status(i) /= E) THEN
+            winner <= board_status(i);
+            win_positions(i) <= ‘1’;
+            win_positions(i+3) <= ‘1’;
+            win_positions(i+6) <= ‘1’;
+            game_won <= ‘1’;
+        END IF;
+
+        -- Check rows
+        IF (board_status(3*(i-1)+1) = board_status(3*(i-1)+2) AND board_status(3*(i-1)+2) = board_status(3*(i-1)+3) AND board_status(i) /= E) THEN
+            winner <= board_status(i);
+            win_positions(3*(i-1)+1) <= ‘1’;
+            win_positions(3*(i-1)+2) <= ‘1’;
+            win_positions(3*(i-1)+3) <= ‘1’;
+            game_won <= ‘1’;
+        END IF;
+    END FOR;
+
+    -- Check diagonals
+    IF (board_status(1) = board_status(5) AND board_status(5) = board_status(9) AND board_status(1) /= E) THEN
+        winner <= board_status(1);
+            win_positions(1) <= ‘1’;
+            win_positions(5) <= ‘1’;
+            win_positions(9) <= ‘1’;
+            game_won <= ‘1’;
+    END IF;
+    IF (board_status(3) = board_status(5) AND board_status(5) = board_status(7) AND board_status(3) /= E) THEN
+        winner <= board_status(3);
+            win_positions(3) <= ‘1’;
+            win_positions(5) <= ‘1’;
+            win_positions(7) <= ‘1’;
+            game_won <= ‘1’;
+    END IF;
+            ELSE
+                valid_move <= '0';
+            END IF;
+        END IF;
+    END PROCESS;
+
     --REFERENCE:  https://stackoverflow.com/questions/27864903/with-select-statement-with-multiple-conditions-vhdl
     WITH mycolor SELECT
         red <= '1' when PIX_RED | PIX_PINK | PIX_YELLOW | PIX_WHITE,
