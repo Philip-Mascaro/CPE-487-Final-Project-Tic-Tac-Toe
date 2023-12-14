@@ -97,9 +97,9 @@ BEGIN
     update_board_process: PROCESS (user_value, board_status, try_pos, try_state)
 BEGIN
     IF user_value = "1101" THEN  -- press D key
-        IF board_status(conv_integer(try_pos)) = E THEN  -- state not taken yet
+        IF board_status(try_pos) = E THEN  -- state not taken yet
             -- Confirm the move and update the board
-            board_status(conv_integer(try_pos)) <= try_state;
+            board_status(try_pos) <= try_state;
 
             -- Switch player turns
             IF player1_turn THEN
