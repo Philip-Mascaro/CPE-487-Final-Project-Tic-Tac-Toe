@@ -90,7 +90,26 @@ ARCHITECTURE Behavioral OF game_board IS
     
     SIGNAL blink_counter : STD_LOGIC_VECTOR(31 DOWNTO 0);
 
+    SIGNAL player1_turn, player2_turn : BOOLEAN := TRUE;
 	
+update_board_process: PROCESS (kp_value, board_status, try_pos, try_state)
+BEGIN
+    IF kp_value = "1101" THEN  -- press D key
+        IF board_status(conv_integer(try_pos)) = E THEN  -- state not taken yet
+            -- Confirm the move and update the board
+            board_status(conv_integer(try_pos)) <= try_state;
+
+            -- Switch player turns
+            IF player1_turn THEN
+                player1_turn <= FALSE;
+                player2_turn <= TRUE;
+            ELSE
+                player1_turn <= TRUE;
+                player2_turn <= FALSE;
+            END IF;
+        END IF;
+    END IF;
+END PROCESS update_board_process;
 	
 	
 	
