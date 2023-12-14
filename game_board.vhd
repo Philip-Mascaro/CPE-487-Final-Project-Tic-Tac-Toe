@@ -426,7 +426,7 @@ BEGIN
 
     -- Check diagonals
         IF (board_status(1) = board_status(5) AND board_status(5) = board_status(9) AND board_status(1) /= E) THEN
-            winner <= board_status(1);
+            winner <= board_status(5);
                 win_positions_diag1(1) <= '1';
                 win_positions_diag1(5) <= '1';
                 win_positions_diag1(9) <= '1';
@@ -434,7 +434,7 @@ BEGIN
         END IF;
     
         IF (board_status(3) = board_status(5) AND board_status(5) = board_status(7) AND board_status(3) /= E) THEN
-            winner <= board_status(3);
+            winner <= board_status(5);
                 win_positions_diag2(3) <= '1';
                 win_positions_diag2(5) <= '1';
                 win_positions_diag2(7) <= '1';
@@ -480,6 +480,12 @@ BEGIN
                         ELSE
                             player1_turn <= TRUE;
                             player2_turn <= FALSE;
+                        END IF;
+                        
+                        IF try_state = X THEN
+                            try_state <= O;
+                        ELSIF try_state = O THEN
+                            try_state <= X;
                         END IF;
                     END IF;
                 END IF;
