@@ -356,7 +356,7 @@ BEGIN
         END IF;
     END PROCESS;
     
-    b_set_board: PROCESS (pixel_on, valid_move, attempt_pixel_on, game_won, i_won) IS
+    b_set_board: PROCESS (pixel_on, valid_move, attempt_pixel_on, game_won, i_won,  comp_opp) IS
     BEGIN
         IF (game_won = 0) THEN
             IF (attempt_pixel_on = '0') THEN
@@ -407,6 +407,34 @@ BEGIN
                 END IF;
             END IF;
         END IF;
+	  IF (reset_game = '1') THEN
+        --FIXED
+
+        Board_status <= (E,E,E,E,E,E,E,E,E);
+        Game_won <= 0;
+        i_won <= "000000000";
+        game_won <= 0;
+        winner <= E
+        win_positions_row <= "000000000";
+        win_positions_col <= "000000000";
+        win_positions_diag1 <= "000000000";
+        win_positions_diag2 <= "000000000";
+        win_positions <= "000000000";
+        Player1_turn <= TRUE;
+
+
+        --RANDOMIZED
+
+        Player1_value <= X;
+        Player2_value <= O;
+        Computer_value <= O;
+
+        reset_game <= '1'
+
+        -- Existing code for game display logic
+        -- logic for player-vs-computer 
+        END IF;
+
     END PROCESS;
     
     --win check
@@ -459,7 +487,7 @@ BEGIN
     BEGIN
         --pixel_on_9 states which of the 9 play positions this pixel might be a part of
         --win_positions states which positions are winners
-        --check if this pixel’s position is one of the winners
+        --check if this pixelÂ’s position is one of the winners
         
 --        for index in 1 to 9 loop
 --            IF (pixel_on_9(index) = win_positions(index) AND pixel_on_9(index) = '1') THEN
