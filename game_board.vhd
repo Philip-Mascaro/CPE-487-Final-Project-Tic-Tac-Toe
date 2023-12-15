@@ -100,7 +100,12 @@ ARCHITECTURE Behavioral OF game_board IS
 	
 	
    
-   
+Signal Reset_game : STD_LOGIC : = ‘0’ ;
+Signal Comp_opp : STD_LOGIC : = ‘0’ ;
+Signal Player1_value : state_type := X;
+Signal Player2_value : state_type := O;
+Signal Computer_value : state_type := O;
+
 
    
 	
