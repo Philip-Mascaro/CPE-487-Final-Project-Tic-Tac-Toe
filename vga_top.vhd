@@ -13,6 +13,9 @@ ENTITY vga_top IS
         --COPIED FROM LAB 4
         KB_col : OUT STD_LOGIC_VECTOR (4 DOWNTO 1); -- keypad column pins
         KB_row : IN STD_LOGIC_VECTOR (4 DOWNTO 1) -- keypad row pins
+	btnd      : IN STD_LOGIC
+	Btnu      : IN STD_LOGIC
+
     );
 END vga_top;
 
