@@ -378,7 +378,99 @@ BEGIN
         END IF;
     END PROCESS;
     
-    
+    -- Declare a process for computer move
+Computer_Move: PROCESS (board_status)
+    VARIABLE rand_seed: INTEGER;
+    VARIABLE ai_pos: INTEGER;
+BEGIN
+    -- Seed the random number generator
+    -- 
+    rand_seed := to_integer(unsigned(rand_seq(SEED)));
+
+    -- Check if middle is available, choose it
+    IF board_status(5) = E THEN
+        ai_pos := 5;
+    ELSE
+        -- Check if corners are available, choose one randomly
+        ai_pos := (rand_seed mod 4) * 2 + 1;
+        IF board_status(ai_pos) /= E THEN
+            ai_pos := ai_pos + 2;
+            IF board_status(ai_pos) /= E THEN
+                ai_pos := ai_pos + 2;
+                IF board_status(ai_pos) /= E THEN
+                    ai_pos := ai_pos + 2;
+                END IF;
+            END IF;
+        END IF;
+    END IF;
+
+    -- Check win/defend condition
+    -- (1-3), (4-6), (7-9) rows
+    FOR i IN 1 TO 7 STEP 3 LOOP
+        IF (board_status(i) = board_status(i + 1) AND board_status(i) /= E) OR
+           (board_status(i + 1) = board_status(i + 2) AND board_status(i + 1) /= E) OR
+           (board_status(i) = board_status(i + 2) AND board_status(i) /= E) THEN
+            -- Win or defend
+            IF board_status(i) = E THEN
+                ai_pos := i;
+            ELSIF board_status(i + 1) = E THEN
+                ai_pos := i + 1;
+            ELSE
+                ai_pos := i + 2;
+            END IF;
+            EXIT; -- Break out of loop if a move is found
+        END IF;
+    END LOOP;
+
+    -- (1,4,7), (2,5,8), (3,6,9) columns
+    FOR i IN 1 TO 3 LOOP
+        IF (board_status(i) = board_status(i + 3) AND board_status(i) /= E) OR
+           (board_status(i + 3) = board_status(i + 6) AND board_status(i + 3) /= E) OR
+           (board_status(i) = board_status(i + 6) AND board_status(i) /= E) THEN
+            -- Win or defend
+            IF board_status(i) = E THEN
+                ai_pos := i;
+            ELSIF board_status(i + 3) = E THEN
+                ai_pos := i + 3;
+            ELSE
+                ai_pos := i + 6;
+            END IF;
+            EXIT; -- Break out of loop if a move is found
+        END IF;
+    END LOOP;
+
+    -- (1,5,9), (3,5,7) diagonals
+    IF (board_status(1) = board_status(5) AND board_status(1) /= E) OR
+       (board_status(5) = board_status(9) AND board_status(5) /= E) OR
+       (board_status(1) = board_status(9) AND board_status(1) /= E) THEN
+        -- Win or defend
+        IF board_status(1) = E THEN
+            ai_pos := 1;
+        ELSIF board_status(5) = E THEN
+            ai_pos := 5;
+        ELSE
+            ai_pos := 9;
+        END IF;
+    ELSIF (board_status(3) = board_status(5) AND board_status(3) /= E) OR
+          (board_status(5) = board_status(7) AND board_status(5) /= E) OR
+          (board_status(3) = board_status(7) AND board_status(3) /= E) THEN
+        -- Win or defend
+        IF board_status(3) = E THEN
+            ai_pos := 3;
+        ELSIF board_status(5) = E THEN
+            ai_pos := 5;
+        ELSE
+            ai_pos := 7;
+        END IF;
+    END IF;
+
+    -- Make the move
+    IF board_status(ai_pos) = E THEN
+        board_status(ai_pos) <= COMPUTER_LETTER;
+    END IF;
+
+END PROCESS Computer_Move;
+
     
     b_set_board: PROCESS (pixel_on, valid_move, attempt_pixel_on, game_won, i_won) IS
     BEGIN
@@ -513,7 +605,7 @@ BEGIN
     BEGIN
         --pixel_on_9 states which of the 9 play positions this pixel might be a part of
         --win_positions states which positions are winners
-        --check if this pixel’s position is one of the winners
+        --check if this pixelÂ’s position is one of the winners
         
 --        for index in 1 to 9 loop
 --            IF (pixel_on_9(index) = win_positions(index) AND pixel_on_9(index) = '1') THEN
