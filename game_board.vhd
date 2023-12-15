@@ -52,7 +52,7 @@ ARCHITECTURE Behavioral OF game_board IS
     SIGNAL board_row: int_array;
     SIGNAL pixel_on_9: STD_LOGIC_VECTOR(1 TO 9);
     
-    type state_type is (X, O, E); --X, O, and Empty
+    type state_type is (O, X, E); --X, O, and Empty
     type board_state is array(1 to 9) of state_type;
     SIGNAL board_status: board_state := (E,E,E,E,E,E,E,E,E);--(O,X,E,O,E,X,E,O,X);
     
@@ -61,7 +61,9 @@ ARCHITECTURE Behavioral OF game_board IS
     
     signal conv_user_val: integer;
     SIGNAL try_pos: integer := 5;
-    SIGNAL try_state: state_type := X;
+    SIGNAL try_state: state_type;
+    SIGNAL swap_count: integer := 0;
+    SIGNAL swap_vector: std_logic_vector(1 downto 0);
     
     SIGNAL attempt_test_x : integer;
     SIGNAL attempt_test_y : integer;
@@ -86,7 +88,7 @@ ARCHITECTURE Behavioral OF game_board IS
     SIGNAL blink_counter : STD_LOGIC_VECTOR(31 DOWNTO 0);
 
     SIGNAL i_won : STD_LOGIC_VECTOR(1 TO 9) := "000000000";
-	SIGNAL winner : state_type := E;
+	SIGNAL winner : state_type;
 	SIGNAL game_won : INTEGER := 0;
 	SIGNAL win_positions_row : STD_LOGIC_VECTOR(1 TO 9) := "000000000";
 	SIGNAL win_positions_col : STD_LOGIC_VECTOR(1 TO 9) := "000000000";
@@ -105,8 +107,16 @@ ARCHITECTURE Behavioral OF game_board IS
 	
 BEGIN
     
-
-
+--    b_start : PROCESS(flag, in_clock, try_state, winner) IS
+--    BEGIN
+--        IF rising_edge(in_clock) THEN
+--            IF (flag = '1') THEN
+--                try_state <= X;
+--                winner <= E;
+--                flag <= '0';
+--            END IF;
+--        END IF;
+--    END PROCESS;
 
 
 --	red <= NOT ball_on;--'1'; -- color setup for red ball on white background
@@ -462,9 +472,19 @@ BEGIN
         i_won <= pixel_on_9 AND win_positions; -- if i_won is all 0, either blakc or white, otherwise green
     END PROCESS;
     
+    b_flip_player: PROCESS (in_clock, player1_turn) IS
+    BEGIN
+        IF rising_edge(in_clock) THEN
+            IF player1_turn THEN
+                try_state <= X;
+            ELSE
+                try_state <= O;
+            END IF;
+        END IF;
+    END PROCESS;
     
 	
-    update_board_process: PROCESS (user_val, board_status, try_pos, try_state, in_clock, key_press)
+    update_board_process: PROCESS (user_val, board_status, try_pos, try_state, in_clock, key_press, swap_count, swap_vector)
     BEGIN
         IF rising_edge(in_clock) THEN
             IF key_press = '1' THEN
@@ -482,11 +502,22 @@ BEGIN
                             player2_turn <= FALSE;
                         END IF;
                         
-                        IF try_state = X THEN
-                            try_state <= O;
-                        ELSIF try_state = O THEN
-                            try_state <= X;
-                        END IF;
+--                        swap_count <= swap_count + 1;
+--                        swap_vector <= conv_std_logic_vector(swap_count,2);
+                        
+--                        if (swap_vector(0) = '0') THEN
+--                            try_state <= X;
+--                        else
+--                            try_state <= O;
+--                        end if;
+                        
+--                        IF (flag = '0') THEN
+--                            IF try_state = X THEN
+--                                try_state <= O;
+--                            ELSIF try_state = O THEN
+--                                try_state <= X;
+--                            END IF;
+--                        END IF;
                     END IF;
                 END IF;
             END IF;
