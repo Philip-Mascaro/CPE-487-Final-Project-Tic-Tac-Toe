@@ -12,10 +12,9 @@ ENTITY vga_top IS
         vga_vsync : OUT STD_LOGIC;
         --COPIED FROM LAB 4
         KB_col : OUT STD_LOGIC_VECTOR (4 DOWNTO 1); -- keypad column pins
-        KB_row : IN STD_LOGIC_VECTOR (4 DOWNTO 1) -- keypad row pins
-	btnd      : IN STD_LOGIC
-	Btnu      : IN STD_LOGIC
-
+        KB_row : IN STD_LOGIC_VECTOR (4 DOWNTO 1); -- keypad row pins
+        Btnd : IN STD_LOGIC;
+        Btnu : IN STD_LOGIC
     );
 END vga_top;
 
@@ -25,12 +24,7 @@ ARCHITECTURE Behavioral OF vga_top IS
     SIGNAL S_red, S_green, S_blue : STD_LOGIC;
     SIGNAL S_vsync : STD_LOGIC;
     SIGNAL S_pixel_row, S_pixel_col : STD_LOGIC_VECTOR (10 DOWNTO 0);
-    Signal Reset_game : STD_LOGIC : = ‘0’ ;
-   Signal Comp_opp : STD_LOGIC : = ‘0’ ;
-   Signal Player1_value : state_type := X;
-   Signal Player2_value : state_type := O;
-  Signal Computer_value : state_type := O;
-
+    SIGNAL RESETTER: STD_LOGIC;
     
     
     --COPIED FROM LAB 4
@@ -59,7 +53,9 @@ ARCHITECTURE Behavioral OF vga_top IS
             blue : OUT STD_LOGIC;
             user_val : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
             key_press : IN STD_LOGIC;
-            in_clock: IN STD_LOGIC
+            in_clock : IN STD_LOGIC;
+            reset_pvp : IN STD_LOGIC;
+            reset_pve : IN STD_LOGIC
         );
     END COMPONENT;
     COMPONENT vga_sync IS
@@ -92,17 +88,7 @@ BEGIN
 	BEGIN
 		IF rising_edge(clk_in) THEN -- on rising edge of clock
 			cnt <= cnt + 1; -- increment counter
-			Reset_game <= ‘1’;
-			Comp_opp <= ‘1’ 
-			Elsif 
-			btnu = ‘1’ then
-			Reset_game <= ‘1’;
-			Comp_opp <= ‘0’ ; 
-			Else
-			Reset_game <= ‘0’
-			End If;
-
-	 	END IF;
+		END IF;
 	END PROCESS;
     kp_clk <= cnt(15); -- keypad interrogation clock
     kp1 : keypad
@@ -129,8 +115,9 @@ BEGIN
         blue      => S_blue,
         user_val  => kp_value,
         key_press => kp_hit,
-        in_clock  => clk_in
-	Reset_game => btnd OR btnu
+        in_clock  => clk_in,
+        reset_pvp => btnd,
+        reset_pve => btnu
     );
 
     vga_driver : vga_sync

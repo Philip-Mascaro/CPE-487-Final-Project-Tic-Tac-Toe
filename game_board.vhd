@@ -13,7 +13,9 @@ ENTITY game_board IS
 		blue      : OUT STD_LOGIC;
 		user_val  : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
 		key_press : IN STD_LOGIC;
-		in_clock  : IN STD_LOGIC
+		in_clock  : IN STD_LOGIC;
+        reset_pvp : IN STD_LOGIC;
+        reset_pve : IN STD_LOGIC
 	);
 END game_board;
 
@@ -96,16 +98,14 @@ ARCHITECTURE Behavioral OF game_board IS
 	SIGNAL win_positions_diag2 : STD_LOGIC_VECTOR(1 TO 9) := "000000000";
 	SIGNAL win_positions : STD_LOGIC_VECTOR(1 TO 9) := "000000000";
 	
-	SIGNAL player1_turn, player2_turn : BOOLEAN := TRUE;
-	
-	
+	SIGNAL player1_turn : BOOLEAN := TRUE;
+	SIGNAL reset_game : STD_LOGIC;
+	SIGNAL Player1_value : state_type;
+    SIGNAL Player2_value : state_type;
+    SIGNAL Computer_value : state_type;
+    SIGNAL Comp_opp : STD_LOGIC;
    
-Signal Reset_game : STD_LOGIC : = ‘0’ ;
-Signal Comp_opp : STD_LOGIC : = ‘0’ ;
-Signal Player1_value : state_type := X;
-Signal Player2_value : state_type := O;
-Signal Computer_value : state_type := O;
-
+   
 
    
 	
@@ -361,7 +361,26 @@ BEGIN
         END IF;
     END PROCESS;
     
-    b_set_board: PROCESS (pixel_on, valid_move, attempt_pixel_on, game_won, i_won,  comp_opp) IS
+    
+    reset_game <= reset_pvp OR reset_pve;
+    
+    b_COMPUTER_SELECT: PROCESS (in_clock, reset_pvp, reset_pve, reset_game) IS
+    BEGIN
+        IF rising_edge(in_clock) THEN
+            IF ( NOT(reset_pvp = '1' AND reset_pve = '1' )) THEN
+                IF reset_pvp = '1' THEN
+                    Comp_opp <= '0';
+                END IF;
+                IF reset_pve = '1' THEN
+                    Comp_opp <= '1';
+                END IF;
+            END IF;
+        END IF;
+    END PROCESS;
+    
+    
+    
+    b_set_board: PROCESS (pixel_on, valid_move, attempt_pixel_on, game_won, i_won) IS
     BEGIN
         IF (game_won = 0) THEN
             IF (attempt_pixel_on = '0') THEN
@@ -412,34 +431,36 @@ BEGIN
                 END IF;
             END IF;
         END IF;
-	  IF (reset_game = '1') THEN
-        --FIXED
-
-        Board_status <= (E,E,E,E,E,E,E,E,E);
-        Game_won <= 0;
-        i_won <= "000000000";
-        game_won <= 0;
-        winner <= E
-        win_positions_row <= "000000000";
-        win_positions_col <= "000000000";
-        win_positions_diag1 <= "000000000";
-        win_positions_diag2 <= "000000000";
-        win_positions <= "000000000";
-        Player1_turn <= TRUE;
-
-
-        --RANDOMIZED
-
-        Player1_value <= X;
-        Player2_value <= O;
-        Computer_value <= O;
-
-        reset_game <= '1'
-
-        -- Existing code for game display logic
-        -- logic for player-vs-computer 
+        
+        IF (reset_game = '1') THEN
+            --FIXED
+    
+            Board_status <= (E,E,E,E,E,E,E,E,E);
+            Game_won <= 0;
+            i_won <= "000000000";
+            game_won <= 0;
+            winner <= E;
+            win_positions_row <= "000000000";
+            win_positions_col <= "000000000";
+            win_positions_diag1 <= "000000000";
+            win_positions_diag2 <= "000000000";
+            win_positions <= "000000000";
+            Player1_turn <= TRUE;
+    
+    
+            --RANDOMIZED
+    
+            Player1_value <= X;
+            Player2_value <= O;
+            Computer_value <= O;
+    
+            reset_game <= '1';
+    
+            -- Existing code for game display logic
+            -- logic for player-vs-computer 
         END IF;
-
+        
+        
     END PROCESS;
     
     --win check
@@ -492,7 +513,7 @@ BEGIN
     BEGIN
         --pixel_on_9 states which of the 9 play positions this pixel might be a part of
         --win_positions states which positions are winners
-        --check if this pixels position is one of the winners
+        --check if this pixel�s position is one of the winners
         
 --        for index in 1 to 9 loop
 --            IF (pixel_on_9(index) = win_positions(index) AND pixel_on_9(index) = '1') THEN
@@ -505,13 +526,13 @@ BEGIN
         i_won <= pixel_on_9 AND win_positions; -- if i_won is all 0, either blakc or white, otherwise green
     END PROCESS;
     
-    b_flip_player: PROCESS (in_clock, player1_turn) IS
+    b_flip_player: PROCESS (in_clock, player1_turn, Player1_value, Player2_value) IS
     BEGIN
         IF rising_edge(in_clock) THEN
             IF player1_turn THEN
-                try_state <= X;
+                try_state <= Player1_value;
             ELSE
-                try_state <= O;
+                try_state <= Player2_value;
             END IF;
         END IF;
     END PROCESS;
@@ -529,10 +550,8 @@ BEGIN
                         -- Switch player turns
                         IF player1_turn THEN
                             player1_turn <= FALSE;
-                            player2_turn <= TRUE;
                         ELSE
                             player1_turn <= TRUE;
-                            player2_turn <= FALSE;
                         END IF;
                         
 --                        swap_count <= swap_count + 1;
