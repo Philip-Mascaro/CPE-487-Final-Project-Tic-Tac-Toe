@@ -94,6 +94,7 @@ ARCHITECTURE Behavioral OF game_board IS
 	SIGNAL win_positions_diag2 : STD_LOGIC_VECTOR(1 TO 9) := "000000000";
 	SIGNAL win_positions : STD_LOGIC_VECTOR(1 TO 9) := "000000000";
 	SIGNAL pos_played :  STD_LOGIC_VECTOR(1 TO 9) := "000000000";
+	SIGNAL is_tied : INTEGER := 0;
 	
 	SIGNAL player1_turn : BOOLEAN := TRUE;
 	SIGNAL reset_game : STD_LOGIC;
@@ -141,6 +142,16 @@ BEGIN
         end if;
     END PROCESS;
     
+    b_is_tied : process (in_clock, pos_played) IS
+    BEGIN
+        IF rising_edge(in_clock) THEN
+            if pos_played = "111111111" then
+                is_tied <= 1;
+            else
+                is_tied <= 0;
+            end if;
+        end if;
+    END PROCESS;
     
     update_board_process: PROCESS (user_val, board_status, try_pos, try_state, in_clock, key_press, swap_count, swap_vector, PS)
     BEGIN
@@ -274,7 +285,7 @@ BEGIN
     END PROCESS;
     
     
-    b_set_board: PROCESS (pixel_on, valid_move, attempt_pixel_on, game_won, i_won, in_clock, reset_pvp, reset_pve, pos_played) IS
+    b_set_board: PROCESS (pixel_on, valid_move, attempt_pixel_on, game_won, i_won, in_clock, reset_pvp, reset_pve, pos_played, is_tied) IS
     BEGIN
         IF (button_visual = '1') THEN
 --                IF (reset_pvp = '1') THEN
@@ -298,13 +309,13 @@ BEGIN
 --            ELSE
 --                mycolor <= PIX_WHITE;
 --            END IF;
-            IF (pos_played = "111111111") then
+            IF (is_tied = 1) then
                 mycolor <= PIX_BLACK;
             ELSE
                 mycolor <= PIX_YELLOW;
             END IF;
         ELSE
-            IF (game_won = 0) THEN
+            IF (game_won = 0) THEN --game_won = 0 and 
                 IF (attempt_pixel_on = '0') THEN
                     IF (pixel_on = '0') THEN
                         mycolor <= PIX_WHITE;
@@ -338,9 +349,7 @@ BEGIN
                 IF (pixel_on = '0') THEN
                     mycolor <= PIX_WHITE;
                 ELSE
-                    IF (game_won = 2) THEN
-                        mycolor <= PIX_YELLOW;
-                    ELSE
+                    IF (game_won = 1) THEN
                         IF (i_won /= "000000000") THEN
                             mycolor <= PIX_GREEN;
                         ELSE
@@ -350,6 +359,9 @@ BEGIN
                                 mycolor <= PIX_BLACK;
                             END IF;
                         END IF;
+                        
+                    ELSE
+                        mycolor <= PIX_YELLOW;
                     END IF;
                 END IF;
             END IF;
