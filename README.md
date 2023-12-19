@@ -6,8 +6,12 @@
      
   * Buttons 1-9 represent each quadrant of our tic tac toe board with 1 being the top left, and 9 being the bottom right. This spot will either turn red to signify an occupied space or blink with the current player's letter to signify an open space. If, the space is open pressing the D key will confirm the move.
    
-  * ![photo of keypad](/Images/board.jpg)
+  * ![photo of board](/Images/board.jpg)
+ 
+  * Our board is only used by the player in order to select the game type and to reset the game. BTNU is used for player vs computer and btny is used for player vs player. X and O is randomized and assigned to players, so you can choose a letter before starting to determine who goes first. Press [butto] to reset the Tic-Tac-Toe game.
+     
   * [Add Description of Board and how to do the reset]
+
   * [Block Diagram for how the files work together]
 
 ## 2. Modifications
@@ -15,7 +19,8 @@
  * Utilized the keypad.vhdl file from Lab 4 and placed the keypad module in the vga_top.
 
 ## 3. Summary of Steps
-* [desmos link for drawing X and O](https://www.desmos.com/calculator/irfxf6ciac)
+*  Would this go here -> [desmos link for drawing X and O](https://www.desmos.com/calculator/irfxf6ciac)
+* I Think this is more, connect the keypad to the nexys board [which port] with the tongs going into the top half. Then connect the vga cable to the board and the vga compatable TV.
 
 ## 5. Conclusion
 ### Task Breakdown
