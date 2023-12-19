@@ -18,7 +18,8 @@
 
 ## 3. Summary of Steps
 *  Would this go here -> [desmos link for drawing X and O](https://www.desmos.com/calculator/irfxf6ciac)
-* I Think this is more what he means,
+  
+### Hardware Setup
 * Connect the keypad to the nexys board [which port] with the tongs going into the top half. Then connect the vga cable to the board and the VGA-compatible TV.
 
 ### Create a new RTL project siren in Vivado Quick Start
