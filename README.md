@@ -10,7 +10,7 @@
 
 ### 2. Summary of Steps
 
-#[desmos link for drawing X and O](https://www.desmos.com/calculator/irfxf6ciac)
+* [desmos link for drawing X and O](https://www.desmos.com/calculator/irfxf6ciac)
 
 ### 3. Run implementation and open implemented design
 
