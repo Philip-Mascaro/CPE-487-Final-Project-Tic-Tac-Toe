@@ -2,7 +2,7 @@
 ### 1. Description
   * The program will create a playable game of Tic-Tac-Toe that can be played in either a player versus player mode or a player versus computer mode.
   *  To play the game you will need a Nexys Board, a keypad and a monitor to display the game.
-  *  [Photo of Keypad]
+  *  /images/keypad.jpg
   * [Add Description for how to use buttons to]
   * [Photo of Board]
   * [Add Description of Board and how to do the reset]
