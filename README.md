@@ -8,20 +8,14 @@
   * [Add Description of Board and how to do the reset]
   * [Block Diagram for how the files work together]
 
-### 2. Summary of Steps
+### 2. Modifications
+ * Utilized Lab 3 as the base framework for the game.
+ * Utilized the keypad.vhdl file from Lab 4 and placed the keypad module in the vga_top.
 
+### 3. Summary of Steps
 * [desmos link for drawing X and O](https://www.desmos.com/calculator/irfxf6ciac)
 
-### 3. Run implementation and open implemented design
-
-### 4. Generate bitstream, open hardware manager, and program device
-
-* Click 'Generate Bitstream'
-
-* Click 'Open Hardware Manager' and click 'Open Target' then 'Auto Connect'
-
-* Click 'Program Device' then xc7a100t_0 to download vga_top.bit to the Nexys A7 board
-
+### 4. Conclusion
 ## Submission:
 * Your final submission should be a github repository of very similar format to the labs themselves with an opening README document with the expected components as follows:
 	* A description of the expected behavior of the project, attachments needed (speaker module, VGA connector, etc.), related images/diagrams, etc.
