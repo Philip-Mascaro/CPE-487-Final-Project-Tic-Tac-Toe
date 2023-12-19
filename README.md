@@ -19,22 +19,23 @@
 ## 3. Summary of Steps
 *  Would this go here -> [desmos link for drawing X and O](https://www.desmos.com/calculator/irfxf6ciac)
   
-### Hardware Setup
-* Connect the keypad to the nexys board [which port] with the tongs going into the top half. Then connect the vga cable to the board and the VGA-compatible TV.
 
-### Create a new RTL project siren in Vivado Quick Start
+### a. Create a new RTL project siren in Vivado Quick Start
 * Create six new source files of file type VHDL called clk_wiz_0, clk_wiz_0_wiz, game_board, keypad, vga_sync, and vga_top
 * Create a new constraint file of file type XDC called vga_top
 * Choose Nexys A7-100T board for the project
 * Click 'Finish'
 * Click design sources and copy the VHDL code from clk_wiz_0.vhd, clk_wiz_0_wiz.vhd, game_board.vhd, keypad.vhd, vga_sync.vhd, and vga_top.vhd
 * Click constraints and copy the code from vga_top.xdc
-### Run synthesis
-### Run implementation and open implemented design
-### Generate bitstream, open hardware manager, and program device
+### b. Run synthesis
+### c. Run implementation and open implemented design
+### d. Generate bitstream, open hardware manager, and program device
 * Click 'Generate Bitstream'
 * Click 'Open Hardware Manager' and click 'Open Target' then 'Auto Connect'
 * Click 'Program Device' then xc7a100t_0 to download siren.bit to the Nexys A7-100T board
+
+### e. Hardware Setup
+* Connect the keypad to the nexys board [which port] with the tongs going into the top half. Then connect the vga cable to the board and the VGA-compatible TV.
 
 ## 5. Conclusion
 ### Task Breakdown
