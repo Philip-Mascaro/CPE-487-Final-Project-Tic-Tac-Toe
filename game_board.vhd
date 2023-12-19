@@ -93,6 +93,7 @@ ARCHITECTURE Behavioral OF game_board IS
 	SIGNAL win_positions_diag1 : STD_LOGIC_VECTOR(1 TO 9) := "000000000";
 	SIGNAL win_positions_diag2 : STD_LOGIC_VECTOR(1 TO 9) := "000000000";
 	SIGNAL win_positions : STD_LOGIC_VECTOR(1 TO 9) := "000000000";
+	SIGNAL pos_played :  STD_LOGIC_VECTOR(1 TO 9) := "000000000";
 	
 	SIGNAL player1_turn : BOOLEAN := TRUE;
 	SIGNAL reset_game : STD_LOGIC;
@@ -124,6 +125,22 @@ BEGIN
         
 --        end if;
 --    END PROCESS;
+    
+    b_tie_board_update : process(board_status, pos_played, in_clock) IS
+    BEGIN
+        IF PS = ST0 THEN
+            pos_played <= "000000000";
+        ELSE
+            IF rising_edge(in_clock) THEN
+                for index in 1 to 9 loop
+                    if (board_status(index) /= E) then
+                        pos_played(index) <= '1';
+                    end if;
+                end loop;
+            end if;
+        end if;
+    END PROCESS;
+    
     
     update_board_process: PROCESS (user_val, board_status, try_pos, try_state, in_clock, key_press, swap_count, swap_vector, PS)
     BEGIN
@@ -257,7 +274,7 @@ BEGIN
     END PROCESS;
     
     
-    b_set_board: PROCESS (pixel_on, valid_move, attempt_pixel_on, game_won, i_won, in_clock, reset_pvp, reset_pve) IS
+    b_set_board: PROCESS (pixel_on, valid_move, attempt_pixel_on, game_won, i_won, in_clock, reset_pvp, reset_pve, pos_played) IS
     BEGIN
         IF (button_visual = '1') THEN
 --                IF (reset_pvp = '1') THEN
@@ -276,11 +293,16 @@ BEGIN
 
             --reset_flag is constantly '1' for some reason
             --reset_game does update properly
-            IF (reset_game = '1') then
-                mycolor <= PIX_CYAN;
+--            IF (reset_game = '1') then
+--                mycolor <= PIX_CYAN;
+--            ELSE
+--                mycolor <= PIX_WHITE;
+--            END IF;
+            IF (pos_played = "111111111") then
+                mycolor <= PIX_BLACK;
             ELSE
-                mycolor <= PIX_WHITE;
-            END IF;   
+                mycolor <= PIX_YELLOW;
+            END IF;
         ELSE
             IF (game_won = 0) THEN
                 IF (attempt_pixel_on = '0') THEN
