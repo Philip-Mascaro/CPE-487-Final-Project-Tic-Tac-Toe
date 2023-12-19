@@ -1,5 +1,5 @@
 # CPE-487-Final-Project-Tic-Tac-Toe
-*Description
+###Description
   * The program will create a playable game of Tic-Tac-Toe that can be played in either a player versus player mode or a player versus computer mode.
   *  To play the game you will need a Nexys Board, a keypad and a monitor to display the game.
   *  [Photo of Keypad]
