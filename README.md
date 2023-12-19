@@ -4,13 +4,11 @@
   *  To play the game you will need a Nexys Board, a keypad and a monitor to display the game.
      ![photo of keypad](/Images/keypad.jpg)
      
-  * Buttons 1-9 represent each quadrant of our tic tac toe board with 1 being the top left, and 9 being the bottom right. This spot will either turn red to signify an occupied space or blink with the current player's letter to signify an open space. If, the space is open pressing the D key will confirm the move.
+  * Our Tic-Tac-Toe board uses buttons 1-9 for each quadrant. 1 is top left, 9 is bottom right. A red blinking letter indicates an occupied space, while a blue blinking letter shows an open space for the current player's turn. Pressing the D key confirms an open space move.
    
   * ![photo of board](/Images/board.jpg)
  
-  * Our board is only used by the player in order to select the game type and to reset the game. BTNU is used for player vs computer and btny is used for player vs player. X and O is randomized and assigned to players, so you can choose a letter before starting to determine who goes first. Press [butto] to reset the Tic-Tac-Toe game.
-     
-  * [Add Description of Board and how to do the reset]
+  * Our board simplifies the game experience. Use BTNU for player vs computer, BTND for player vs player. X and O are randomly assigned; choose before the game to determine the starting player. Press BTNU or BTND to reset the Tic-Tac-Toe game.
 
   * [Block Diagram for how the files work together]
 
@@ -20,12 +18,12 @@
 
 ## 3. Summary of Steps
 *  Would this go here -> [desmos link for drawing X and O](https://www.desmos.com/calculator/irfxf6ciac)
-* I Think this is more, connect the keypad to the nexys board [which port] with the tongs going into the top half. Then connect the vga cable to the board and the vga compatable TV.
+* I Think this is more, connect the keypad to the nexys board [which port] with the tongs going into the top half. Then connect the vga cable to the board and the VGA-compatible TV.
 
 ## 5. Conclusion
 ### Task Breakdown
 * Philip Mascaro was in charge of the graphical display for the game as well as the ability for the player to select their move. He also performed error fixing for various processes of the gameboard such as the resetting and tie functions.
-* Jett Tinik worked on the adding in the ability for players to conform their moves, the ability to switch between the two players, and the computer opponent.
+* Jett Tinik worked on adding in the ability for players to conform their moves, the ability to switch between the two players, and the computer opponent.
 * Jeffrey Tharakan created the win conditions and the ability for players to reset the game and choose whether they want to do a player versus player game or a player versus computer game.
 ### Timeline
 * Week 1: create the graphical display
