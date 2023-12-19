@@ -95,6 +95,8 @@ ARCHITECTURE Behavioral OF game_board IS
 	SIGNAL win_positions : STD_LOGIC_VECTOR(1 TO 9) := "000000000";
 	SIGNAL pos_played :  STD_LOGIC_VECTOR(1 TO 9) := "000000000";
 	SIGNAL is_tied : INTEGER := 0;
+    SIGNAL game_finished : INTEGER := 0;
+	SIGNAL game_tie_sum : INTEGER := 0;
 	
 	SIGNAL player1_turn : BOOLEAN := TRUE;
 	SIGNAL reset_game : STD_LOGIC;
@@ -149,6 +151,24 @@ BEGIN
                 is_tied <= 1;
             else
                 is_tied <= 0;
+            end if;
+        end if;
+    END PROCESS;
+    
+    b_game_tie_sum : process(in_clock, game_won, is_tied) IS
+    BEGIN
+        IF rising_edge(in_clock) THEN
+            game_tie_sum <= game_won + is_tied;
+        end if;
+    END PROCESS;
+    
+    b_is_finished: process(in_clock, game_won) IS
+    BEGIN
+        IF rising_edge(in_clock) THEN
+            if (game_won > 0) then
+                game_finished <= 1;
+            else
+                game_finished <= 0;
             end if;
         end if;
     END PROCESS;
@@ -285,7 +305,7 @@ BEGIN
     END PROCESS;
     
     
-    b_set_board: PROCESS (pixel_on, valid_move, attempt_pixel_on, game_won, i_won, in_clock, reset_pvp, reset_pve, pos_played, is_tied) IS
+    b_set_board: PROCESS (pixel_on, valid_move, attempt_pixel_on, game_won, i_won, in_clock, reset_pvp, reset_pve, pos_played, is_tied, game_finished, GAME_TIE_SUM) IS
     BEGIN
         IF (button_visual = '1') THEN
 --                IF (reset_pvp = '1') THEN
@@ -314,8 +334,16 @@ BEGIN
             ELSE
                 mycolor <= PIX_YELLOW;
             END IF;
+--            IF (game_tie_sum = 0) then
+--                mycolor <= PIX_BLACK;
+--            ELSIF (game_tie_sum = 1) then
+--                mycolor <= PIX_BLUE;
+--            ELSE
+--                mycolor <= PIX_GREEN;
+--            END IF;
+--            mycolor <= PIX_WHITE;
         ELSE
-            IF (game_won = 0) THEN --game_won = 0 and 
+            IF (game_tie_sum = 0) THEN --game_won = 0 and 
                 IF (attempt_pixel_on = '0') THEN
                     IF (pixel_on = '0') THEN
                         mycolor <= PIX_WHITE;
@@ -361,7 +389,11 @@ BEGIN
                         END IF;
                         
                     ELSE
-                        mycolor <= PIX_YELLOW;
+                        IF (pixel_on = '0') THEN
+                            mycolor <= PIX_WHITE;
+                        ELSE
+                            mycolor <= PIX_YELLOW;
+                        END IF;
                     END IF;
                 END IF;
             END IF;
