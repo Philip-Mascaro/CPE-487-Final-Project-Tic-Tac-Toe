@@ -36,21 +36,8 @@
 
 * The **_vga_top_** module will connect the **_vga_sync_** and **_ball_** modules together and connect the appropriate signals to the board.
 
-### 1. Create a new RTL project _vgaball_ in Vivado Quick Start
-
-* Create five new source files of file type VHDL called **_clk_wiz_0_**, **_clk_wiz_0_clk_wiz_**, **_vga_sync_**, **_ball_**, and **_vga_top_**
-
-* Create a new constraint file of file type XDC called **_vga_top_**
-
-* Choose Nexys A7-100T board for the project
-
-* Click 'Finish'
-
-* Click design sources and copy the VHDL code from clk_wiz_0.vhd, clk_wiz_0_clk_wiz.vhd, vga_sync.vhd, ball.vhd, and vga_top.vhd
-
-* Click constraints and copy the code from vga_top.xdc
-
-### 2. Run synthesis
+### 1. Description
+### 2. 
 
 ### 3. Run implementation and open implemented design
 
