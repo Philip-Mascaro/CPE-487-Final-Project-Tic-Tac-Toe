@@ -1,7 +1,7 @@
 # CPE-487-Final-Project-Tic-Tac-Toe
 ## 1. Description
   * The program will create a playable game of Tic-Tac-Toe that can be played in either a player versus player mode or a player versus computer mode.
-  *  To play the game you will need a Nexys Board, a keypad and a monitor to display the game.
+  *  To play the game you will need a Nexys Board, a keypad, and a monitor to display the game.
      ![photo of keypad](/Images/keypad.jpg)
      
   * Our Tic-Tac-Toe board uses buttons 1-9 for each quadrant. 1 is top left, 9 is bottom right. A red blinking letter indicates an occupied space, while a blue blinking letter shows an open space for the current player's turn. Pressing the D key confirms an open space move.
@@ -15,11 +15,17 @@
 ## 2. Modifications
  * Utilized Lab 3 as the base framework for the game.
  * Utilized the keypad.vhdl file from Lab 4 and placed the keypad module in the vga_top.
+ * List where we got the randomization code from!!!
+ * For the computer turn-based moves we just started from general game logic. What are commonly used strategies when playing and how to react to winning situations when they arise? After considering these we wrote this sudo code
+If the middle is open take it
+   If not go for the corners
+   If there are two letters in any section with a space (win check)
+   Move there (Block or win that section)
+   Elsif plays a random move
 
 ## 3. Summary of Steps
 *  Would this go here -> [desmos link for drawing X and O](https://www.desmos.com/calculator/irfxf6ciac)
   
-
 ### a. Create a new RTL project siren in Vivado Quick Start
 * Create six new source files of file type VHDL called clk_wiz_0, clk_wiz_0_wiz, game_board, keypad, vga_sync, and vga_top
 * Create a new constraint file of file type XDC called vga_top
