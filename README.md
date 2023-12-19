@@ -4,7 +4,7 @@
   *  To play the game you will need a Nexys Board, a keypad and a monitor to display the game.
      ![photo of keypad](/Images/keypad.jpg)
   * [Add Description for how to use buttons to]
-  * [Photo of Board]
+  * ![photo of keypad](/Images/board.jpg)
   * [Add Description of Board and how to do the reset]
   * [Block Diagram for how the files work together]
 
