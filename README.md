@@ -28,6 +28,3 @@
 * "Ghost Signals" Slightly hidden signals were registering on the display.
 * Tie condition was having mutliple errors icnluding having the "O" signals appearing white in the display when they should have been black
 ntation with all components.
-
-* If you are still “attached” to a particular lab (calculator, pong, etc.), you may still explore these areas further with additional functionality (many more operations for a calculator, multiple players or other modifications for pong, etc.)
-	* However, the above would fall under the “simple” category for project complexity. “Simple” projects (especially for groups of 3 students) will face additional scrutiny in the documentation and code. This isn’t meant to be a deterrent, but it is only fair that more ambitious projects have a bit more leeway if one section of the code isn’t working as anticipated, the documentation is a little sparse, etc.
