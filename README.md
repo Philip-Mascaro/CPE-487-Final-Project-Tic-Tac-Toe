@@ -17,11 +17,11 @@
  * Utilized the keypad.vhdl file from Lab 4 and placed the keypad module in the vga_top.
  * List where we got the randomization code from!!!
  * For the computer turn-based moves we just started from general game logic. What are commonly used strategies when playing and how to react to winning situations when they arise? After considering these we wrote this sudo code
-   If the middle is open take it
-   If not go for the corners
-   If there are two letters in any section with a space (win check)
-   Move there (Block or win that section)
-   Elsif plays a random move
+   > If the middle is open take it
+   > If not go for the corners
+   > If there are two letters in any section with a space (win check)
+   > Move there (Block or win that section)
+   > Elsif plays a random move
 
 ## 3. Summary of Steps
 *  Would this go here -> [desmos link for drawing X and O](https://www.desmos.com/calculator/irfxf6ciac)
