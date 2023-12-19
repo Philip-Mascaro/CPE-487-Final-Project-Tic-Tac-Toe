@@ -21,15 +21,11 @@ END game_board;
 
 ARCHITECTURE Behavioral OF game_board IS
 	CONSTANT size  : INTEGER := 80;
-	--CONSTANT rad_A : INTEGER := 40;
-	--CONSTANT rad_B : INTEGER := 80;
 	CONSTANT half_width: INTEGER := 20;
 	SIGNAL pixel_on : STD_LOGIC; -- indicates whether ball is over current pixel position
 	-- current ball position - intitialized to center of screen
 	SIGNAL screen_center_x  : STD_LOGIC_VECTOR(10 DOWNTO 0) := CONV_STD_LOGIC_VECTOR(400, 11);
 	SIGNAL screen_center_y  : STD_LOGIC_VECTOR(10 DOWNTO 0) := CONV_STD_LOGIC_VECTOR(300, 11);
-	-- current ball motion - initialized to +4 pixels/frame
-	--SIGNAL ball_y_motion : STD_LOGIC_VECTOR(10 DOWNTO 0) := -"00000000100";
 	
 	--REFERENCE:  https://www.edaboard.com/threads/using-integer-arrays-in-vhdl.132696/
 	type int_array is array(1 to 9) of integer;
@@ -50,8 +46,8 @@ ARCHITECTURE Behavioral OF game_board IS
     
     SIGNAL board_center_x  : log_vec_array;
     SIGNAL board_center_y  : log_vec_array;
-    SIGNAL board_col: int_array;
-    SIGNAL board_row: int_array;
+    SIGNAL board_col: int_array := (-1,0,1,-1,0,1,-1,0,1);
+    SIGNAL board_row: int_array := (-1,-1,-1,0,0,0,1,1,1);
     SIGNAL pixel_on_9: STD_LOGIC_VECTOR(1 TO 9);
     
     type state_type is (O, X, E); --X, O, and Empty
@@ -104,123 +100,125 @@ ARCHITECTURE Behavioral OF game_board IS
     SIGNAL Player2_value : state_type;
     SIGNAL Computer_value : state_type;
     SIGNAL Comp_opp : STD_LOGIC;
-   
-   
 
-   
-	
+    --SIGNAL reset_flag : STD_LOGIC;
+    SIGNAL button_visual : std_logic;
+	type signal_resetting is (ST0, ST1);
+	SIGNAL PS, NS: signal_resetting;
 	
 BEGIN
+
+    --ALWAYS RUNNING
     
---    b_start : PROCESS(flag, in_clock, try_state, winner) IS
+    SYNC_PROC: process(reset_game, NS, in_clock) IS
+    BEGIN
+        IF reset_game = '1' THEN
+            PS <= ST0;
+        ELSIF rising_edge(in_clock) THEN
+            PS <= NS;
+        END IF;
+    END PROCESS;
+    
+--    b_state_update : PROCESS(PS) IS
 --    BEGIN
---        IF rising_edge(in_clock) THEN
---            IF (flag = '1') THEN
---                try_state <= X;
---                winner <= E;
---                flag <= '0';
---            END IF;
---        END IF;
+        
+--        end if;
 --    END PROCESS;
-
-
---	red <= NOT ball_on;--'1'; -- color setup for red ball on white background
---	green <= NOT ball_on;
---	blue  <= NOT ball_on;
+    
+    update_board_process: PROCESS (user_val, board_status, try_pos, try_state, in_clock, key_press, swap_count, swap_vector, PS)
+    BEGIN
+        IF PS = ST0 THEN
+            --FIXED
+    
+            Board_status <= (E,E,E,E,E,E,E,E,E);
+            Player1_turn <= TRUE;
+    
+    
+            --RANDOMIZED
+    
+            Player1_value <= X;
+            Player2_value <= O;
+            Computer_value <= O;
+    
+    
+            -- Existing code for game display logic
+            -- logic for player-vs-computer 
+            NS <= ST1;
+        ELSE
+           IF rising_edge(in_clock) THEN
+                IF key_press = '1' THEN
+                    IF user_val = "1101" AND game_won = 0 THEN  -- press D key
+                        IF board_status(try_pos) = E THEN  -- state not taken yet
+                            -- Confirm the move and update the board
+                            board_status(try_pos) <= try_state;
+                
+                            -- Switch player turns
+                            IF player1_turn THEN
+                                player1_turn <= FALSE;
+                            ELSE
+                                player1_turn <= TRUE;
+                            END IF;
+                        END IF;
+                    END IF;
+                END IF;
+           END IF;
+        END IF;
+    END PROCESS update_board_process;
+    
+    
 	-- process to draw ball current pixel address is covered by ball position
-	bdraw : PROCESS (pixel_row, pixel_col, board_status, valid_move) IS
+	bdraw : PROCESS (pixel_row, pixel_col, board_status, valid_move, in_clock, button_visual) IS
 	BEGIN
-	
+        
+        IF (pixel_row < 50 AND pixel_col < 50) THEN
+            button_visual <= '1';
+        else
+            button_visual <= '0';
+        end if;
+        
        width <= 2*half_width;--rad_B - rad_A;
        test_width2 <= width * width;
        compare_radA2 <= (size-width)*(size-width);--rad_A * rad_A;
        compare_radB2 <= size*size;--rad_B * rad_B;
        pixel_on <= '0';
        pixel_on_9 <= "000000000";
+
        
-       
-       board_col(1) <= -1;
-       board_col(2) <= 0;
-       board_col(3) <= 1;
-       board_col(4) <= -1;
-       board_col(5) <= 0;
-       board_col(6) <= 1;
-       board_col(7) <= -1;
-       board_col(8) <= 0;
-       board_col(9) <= 1;
-       
-       board_row(1) <= -1;
-       board_row(2) <= -1;
-       board_row(3) <= -1;
-       board_row(4) <= 0;
-       board_row(5) <= 0;
-       board_row(6) <= 0;
-       board_row(7) <= 1;
-       board_row(8) <= 1;
-       board_row(9) <= 1;
-       
-       
-       
-       
-       
-	   for index in 1 to 9 loop
+       for index in 1 to 9 loop
             board_center_x(index) <= screen_center_x + board_col(index)*(size+size+15);
             board_center_y(index) <= screen_center_y + board_row(index)*(size+size+15);
        
             IF (pixel_col >= board_center_x(index) - size) AND
-             (pixel_col <= board_center_x(index) + size) AND
-                 (pixel_row >= board_center_y(index) - size) AND
-                 (pixel_row <= board_center_y(index) + size) THEN
+            (pixel_col <= board_center_x(index) + size) AND
+            (pixel_row >= board_center_y(index) - size) AND
+            (pixel_row <= board_center_y(index) + size) THEN
                  
-                    test_x(index) <= conv_integer(pixel_col) - conv_integer(board_center_x(index));
-                    test_y(index) <= conv_integer(pixel_row) - conv_integer(board_center_y(index));
-                    test_minus(index) <= test_x(index) - test_y(index);
-                    test_plus(index) <= test_x(index) + test_y(index);
-                    test_minus2(index) <= test_minus(index) * test_minus(index);
-                    test_plus2(index) <= test_plus(index) * test_plus(index);
-                    test_x2(index) <= test_x(index) * test_x(index);
-                    test_y2(index) <= test_y(index) * test_y(index);
-                    test_rad2(index) <= test_x2(index) + test_y2(index);
-                    
-                    IF (board_status(index) = X) THEN
-                        IF (2*test_minus2(index) <= test_width2 OR 2*test_plus2(index) <= test_width2) THEN
-                            pixel_on_9(index) <= '1';
-                        END IF;
-                    ELSIF (board_status(index) = O) THEN
-                        IF (test_rad2(index) >= compare_radA2 AND test_rad2(index) <= compare_radB2 ) THEN
-                            pixel_on_9(index) <= '1';
-                        END IF;
+                test_x(index) <= conv_integer(pixel_col) - conv_integer(board_center_x(index));
+                test_y(index) <= conv_integer(pixel_row) - conv_integer(board_center_y(index));
+                test_minus(index) <= test_x(index) - test_y(index);
+                test_plus(index) <= test_x(index) + test_y(index);
+                test_minus2(index) <= test_minus(index) * test_minus(index);
+                test_plus2(index) <= test_plus(index) * test_plus(index);
+                test_x2(index) <= test_x(index) * test_x(index);
+                test_y2(index) <= test_y(index) * test_y(index);
+                test_rad2(index) <= test_x2(index) + test_y2(index);
+                
+                IF (board_status(index) = X) THEN
+                    IF (2*test_minus2(index) <= test_width2 OR 2*test_plus2(index) <= test_width2) THEN
+                        pixel_on_9(index) <= '1';
                     END IF;
---                ELSIF (pixel_col >= size+size+10+ball_x - size) AND
---                 (pixel_col <= size+size+10+ball_x + size) AND
---                     (pixel_row >= size+size+10+ball_y - size) AND
---                     (pixel_row <= size+size+10+ball_y + size) THEN
---                        test_x <= conv_integer(pixel_col) - conv_integer(size+size+10+ball_x);
---                        test_y <= conv_integer(pixel_row) - conv_integer(size+size+10+ball_y);
---                        test_x2 <= test_x * test_x;
---                        test_y2 <= test_y * test_y;
---                        test_rad2 <= test_x2 + test_y2;
---                        IF (test_rad2 >= compare_radA2 AND test_rad2 <= compare_radB2 ) THEN
---                            ball_on <= '1';
---                        END IF;
---                ELSIF (pixel_col >= ball_x-(size+size+10) - size) AND
---                 (pixel_col <= ball_x-(size+size+10) + size) AND
---                     (pixel_row >= ball_y-(size+size+10) - size) AND
---                     (pixel_row <= ball_y-(size+size+10) + size) THEN
---                        test_x <= conv_integer(pixel_col) - conv_integer(ball_x-(size+size+10));
---                        test_y <= conv_integer(pixel_row) - conv_integer(ball_y-(size+size+10));
---                        test_x2 <= test_x * test_x;
---                        test_y2 <= test_y * test_y;
---                        test_rad2 <= test_x2 + test_y2;
---                        IF (test_rad2 >= compare_radA2 AND test_rad2 <= compare_radB2 ) THEN
---                            ball_on <= '1';
---                        END IF;
-    --		ELSE
-    --			ball_on <= '0';
+                ELSIF (board_status(index) = O) THEN
+                    IF (test_rad2(index) >= compare_radA2 AND test_rad2(index) <= compare_radB2 ) THEN
+                        pixel_on_9(index) <= '1';
+                    END IF;
+                END IF;
             END IF;
         end loop;
-        IF (pixel_on_9 = "000000000") THEN pixel_on <= '0';
-        ELSE pixel_on <= '1';
+        
+        IF (pixel_on_9 = "000000000") THEN
+            pixel_on <= '0';
+        ELSE
+            pixel_on <= '1';
         END IF;
         
        attempt_test_width2 <= half_width * half_width;
@@ -233,8 +231,8 @@ BEGIN
         
         IF (pixel_col >= attempt_board_center_x - size) AND
         (pixel_col <= attempt_board_center_x + size) AND
-            (pixel_row >= attempt_board_center_y - size) AND
-            (pixel_row <= attempt_board_center_y + size) THEN
+        (pixel_row >= attempt_board_center_y - size) AND
+        (pixel_row <= attempt_board_center_y + size) THEN
              
             attempt_test_x <= conv_integer(pixel_col) - conv_integer(attempt_board_center_x);
             attempt_test_y <= conv_integer(pixel_row) - conv_integer(attempt_board_center_y);
@@ -256,115 +254,188 @@ BEGIN
                 END IF;
             END IF;
         END IF;
-        
-        
     END PROCESS;
     
---    b_status_update : PROCESS(key_press, user_val, current_try_pos) IS
---    BEGIN
---        IF key_press = '1' THEN
---            current_try_pos <= conv_integer(user_val);
---        ELSE
---            try_pos <= current_try_pos;
---        END IF;
---    END PROCESS;
     
---    b_lock : PROCESS(current_try_pos, try_pos) IS
---    BEGIN
---        IF current_try_pos /= try_pos THEN
-            
---        END IF;
---    END PROCESS;
-
-
---    b_update_test : PROCESS(key_press, conv_user_val) IS
---    BEGIN
---        IF key_press = '1' THEN
---            --try_pos <= 1
---            try_pos <= conv_user_val;
---        ELSE
---            try_pos <= 5;
---        END IF;
---    END PROCESS;
-    
---    b_integer : PROCESS(user_val) IS
---    BEGIN
---        conv_user_val <= conv_integer(user_val);
---    END PROCESS;
-    
---    b_update_test : PROCESS(conv_user_val) IS
---    BEGIN
---            try_pos <= conv_user_val;
---    END PROCESS;
-    
---    b_integer : PROCESS(user_val, key_press, try_pos) IS
---    BEGIN
---        IF key_press = '1' THEN
---            conv_user_val <= conv_integer(user_val);
---        ELSE
---            conv_user_val <= try_pos;
---        END IF;
---    END PROCESS;
-    
-    b_integer : PROCESS(user_val) IS
+    b_set_board: PROCESS (pixel_on, valid_move, attempt_pixel_on, game_won, i_won, in_clock, reset_pvp, reset_pve) IS
     BEGIN
-        conv_user_val <= conv_integer(user_val);
+        IF (button_visual = '1') THEN
+--                IF (reset_pvp = '1') THEN
+--                    IF (reset_pve = '1') THEN
+--                        mycolor <= PIX_PINK;
+--                    ELSE
+--                        mycolor <= PIX_BLUE;
+--                    END IF;
+--                ELSE
+--                    IF (reset_pve = '1') THEN
+--                        mycolor <= PIX_RED;
+--                    ELSE
+--                        mycolor <= PIX_WHITE;
+--                    END IF;
+--                END IF;
+
+            --reset_flag is constantly '1' for some reason
+            --reset_game does update properly
+            IF (reset_game = '1') then
+                mycolor <= PIX_CYAN;
+            ELSE
+                mycolor <= PIX_WHITE;
+            END IF;   
+        ELSE
+            IF (game_won = 0) THEN
+                IF (attempt_pixel_on = '0') THEN
+                    IF (pixel_on = '0') THEN
+                        mycolor <= PIX_WHITE;
+                    ELSE
+                        mycolor <= PIX_BLACK;
+                    END IF;
+                ELSE
+                    IF valid_move = '1' THEN
+                        IF blink_counter(25) = '1' THEN
+                            mycolor <= PIX_BLUE;
+                        ELSE
+                            IF (pixel_on = '0') THEN
+                                mycolor <= PIX_WHITE;
+                            ELSE
+                                mycolor <= PIX_BLACK;
+                            END IF;
+                        END IF;
+                    ELSE
+                        IF blink_counter(25) = '1' THEN
+                            mycolor <= PIX_RED;
+                        ELSE
+                            IF (pixel_on = '0') THEN
+                                mycolor <= PIX_WHITE;
+                            ELSE
+                                mycolor <= PIX_BLACK;
+                            END IF;
+                        END IF;
+                    END IF;
+                END IF;
+            ELSE
+                IF (pixel_on = '0') THEN
+                    mycolor <= PIX_WHITE;
+                ELSE
+                    IF (game_won = 2) THEN
+                        mycolor <= PIX_YELLOW;
+                    ELSE
+                        IF (i_won /= "000000000") THEN
+                            mycolor <= PIX_GREEN;
+                        ELSE
+                            IF (pixel_on = '0') THEN
+                                mycolor <= PIX_WHITE;
+                            ELSE
+                                mycolor <= PIX_BLACK;
+                            END IF;
+                        END IF;
+                    END IF;
+                END IF;
+            END IF;
+        END IF;
+        
+        
     END PROCESS;
     
-    b_counter : PROCESS (blink_counter) IS
+    
+    
+    
+    --REFERENCE:  https://stackoverflow.com/questions/27864903/with-select-statement-with-multiple-conditions-vhdl
+    WITH mycolor SELECT
+        red <= '1' when PIX_RED | PIX_PINK | PIX_YELLOW | PIX_WHITE,
+               '0' when others;
+    WITH mycolor SELECT
+        green <= '1' when PIX_GREEN | PIX_CYAN | PIX_YELLOW | PIX_WHITE,
+                 '0' when others;
+    WITH mycolor SELECT
+        blue <= '1' when PIX_BLUE | PIX_CYAN | PIX_PINK | PIX_WHITE,
+                '0' when others;
+        
+    
+    
+    b_integer : PROCESS(user_val, in_clock) IS
+    BEGIN
+        IF rising_edge(in_clock) THEN
+            conv_user_val <= conv_integer(user_val);
+        END IF;
+    END PROCESS;
+    
+    
+    b_counter : PROCESS (blink_counter, in_clock) IS
     BEGIN
         IF rising_edge(in_clock) THEN
             blink_counter <= blink_counter + 1;
         END IF;
     END PROCESS;
+
+	b_am_i_a_winner: PROCESS(win_positions, pixel_on_9, in_clock) IS
+    BEGIN
+        IF rising_edge(in_clock) THEN
+            i_won <= pixel_on_9 AND win_positions; -- if i_won is all 0, either blakc or white, otherwise green
+        END IF;
+    END PROCESS;
+    
     
     b_update_test : PROCESS(key_press, conv_user_val, in_clock) IS
     BEGIN
         IF rising_edge(in_clock) THEN
             IF key_press = '1' THEN
-                --try_pos <= 1
                 IF conv_user_val > 0 and conv_user_val < 10 THEN
                     try_pos <= conv_user_val;
                 END IF;
---            ELSE
---                try_pos <= 5;
             END IF;
 		END IF;
     END PROCESS;
     
     
---    b_status : PROCESS (board_status, try_state, user_val) IS
---	BEGIN
---       board_status(1) <= O;
---       board_status(2) <= X;
---       board_status(3) <= E;
---       board_status(4) <= O;
---       board_status(5) <= E;
---       board_status(6) <= X;
---       board_status(7) <= E;
---       board_status(8) <= O;
---       board_status(9) <= X;
-
---       try_state <= X;
-       
---    END PROCESS;
-    
-    b_attempt: PROCESS (board_status, try_pos, try_state, pixel_on, valid_move) IS
+    b_attempt: PROCESS (board_status, try_pos, try_state, pixel_on, valid_move, in_clock) IS
     BEGIN
-        IF (attempt_pixel_on = '1') THEN
-            IF board_status(try_pos) = E THEN
-                valid_move <= '1';
-            ELSE
-                valid_move <= '0';
+        IF rising_edge(in_clock) THEN
+            IF (attempt_pixel_on = '1') THEN
+                IF board_status(try_pos) = E THEN
+                    valid_move <= '1';
+                ELSE
+                    valid_move <= '0';
+                END IF;
+                
             END IF;
-            
+        END IF;
+    END PROCESS;
+    
+    b_resetter: PROCESS(in_clock, reset_pvp, reset_pve) IS
+    BEGIN
+        IF rising_edge(in_clock) THEN
+            IF reset_pvp = '1' OR reset_pve = '1' THEN
+                reset_game <= '1';
+            ELSE
+                reset_game <= '0';
+            END IF;
         END IF;
     END PROCESS;
     
     
-    reset_game <= reset_pvp OR reset_pve;
+    --BUTTON PRESSED
     
-    b_COMPUTER_SELECT: PROCESS (in_clock, reset_pvp, reset_pve, reset_game) IS
+--    b_button_toggle: Process(in_clock, reset_game, reset_flag) IS
+--    BEGIN
+--        IF rising_edge(in_clock) THEN
+--            IF reset_game = '1' AND reset_flag /= '1' THEN
+--                reset_flag <= '1';
+--            END IF;
+--        END IF;
+--    END PROCESS;
+    
+--    b_flag_change: PROCESS(in_clock, reset_flag) IS
+--    BEGIN
+--        IF rising_edge(in_clock) THEN
+--            IF reset_flag = '1' THEN
+--                reset_flag <= '0' after 1000 ns;
+--            END IF;
+--        END IF;
+--    END PROCESS;
+    
+
+    
+    b_COMPUTER_SELECT: PROCESS (in_clock, reset_pvp, reset_pve) IS
     BEGIN
         IF rising_edge(in_clock) THEN
             IF ( NOT(reset_pvp = '1' AND reset_pve = '1' )) THEN
@@ -378,158 +449,65 @@ BEGIN
         END IF;
     END PROCESS;
     
-    -- Declare a process for computer move
-Computer_Move: PROCESS (board_status)
-    VARIABLE rand_seed: INTEGER;
-    VARIABLE ai_pos: INTEGER;
-BEGIN
-    -- Seed the random number generator
-    -- 
-    rand_seed := to_integer(unsigned(rand_seq(SEED)));
+--    b_reset_board: PROCESS (in_clock, reset_flag) IS
+--    BEGIN
+--        IF rising_edge(in_clock) THEN
+--            IF reset_flag = '1' THEN --AND game_on = '0' THEN -- test for new game
 
-    -- Check if middle is available, choose it
-    IF board_status(5) = E THEN
-        ai_pos := 5;
-    ELSE
-        -- Check if corners are available, choose one randomly
-        ai_pos := (rand_seed mod 4) * 2 + 1;
-        IF board_status(ai_pos) /= E THEN
-            ai_pos := ai_pos + 2;
-            IF board_status(ai_pos) /= E THEN
-                ai_pos := ai_pos + 2;
-                IF board_status(ai_pos) /= E THEN
-                    ai_pos := ai_pos + 2;
-                END IF;
-            END IF;
-        END IF;
-    END IF;
-
-    -- Check win/defend condition
-    -- (1-3), (4-6), (7-9) rows
-    FOR i IN 1 TO 7 STEP 3 LOOP
-        IF (board_status(i) = board_status(i + 1) AND board_status(i) /= E) OR
-           (board_status(i + 1) = board_status(i + 2) AND board_status(i + 1) /= E) OR
-           (board_status(i) = board_status(i + 2) AND board_status(i) /= E) THEN
-            -- Win or defend
-            IF board_status(i) = E THEN
-                ai_pos := i;
-            ELSIF board_status(i + 1) = E THEN
-                ai_pos := i + 1;
-            ELSE
-                ai_pos := i + 2;
-            END IF;
-            EXIT; -- Break out of loop if a move is found
-        END IF;
-    END LOOP;
-
-    -- (1,4,7), (2,5,8), (3,6,9) columns
-    FOR i IN 1 TO 3 LOOP
-        IF (board_status(i) = board_status(i + 3) AND board_status(i) /= E) OR
-           (board_status(i + 3) = board_status(i + 6) AND board_status(i + 3) /= E) OR
-           (board_status(i) = board_status(i + 6) AND board_status(i) /= E) THEN
-            -- Win or defend
-            IF board_status(i) = E THEN
-                ai_pos := i;
-            ELSIF board_status(i + 3) = E THEN
-                ai_pos := i + 3;
-            ELSE
-                ai_pos := i + 6;
-            END IF;
-            EXIT; -- Break out of loop if a move is found
-        END IF;
-    END LOOP;
-
-    -- (1,5,9), (3,5,7) diagonals
-    IF (board_status(1) = board_status(5) AND board_status(1) /= E) OR
-       (board_status(5) = board_status(9) AND board_status(5) /= E) OR
-       (board_status(1) = board_status(9) AND board_status(1) /= E) THEN
-        -- Win or defend
-        IF board_status(1) = E THEN
-            ai_pos := 1;
-        ELSIF board_status(5) = E THEN
-            ai_pos := 5;
-        ELSE
-            ai_pos := 9;
-        END IF;
-    ELSIF (board_status(3) = board_status(5) AND board_status(3) /= E) OR
-          (board_status(5) = board_status(7) AND board_status(5) /= E) OR
-          (board_status(3) = board_status(7) AND board_status(3) /= E) THEN
-        -- Win or defend
-        IF board_status(3) = E THEN
-            ai_pos := 3;
-        ELSIF board_status(5) = E THEN
-            ai_pos := 5;
-        ELSE
-            ai_pos := 7;
-        END IF;
-    END IF;
-
-    -- Make the move
-    IF board_status(ai_pos) = E THEN
-        board_status(ai_pos) <= COMPUTER_LETTER;
-    END IF;
-
-END PROCESS Computer_Move;
-
+--            END IF;
+--        END IF;
+--    END PROCESS;
     
-    b_set_board: PROCESS (pixel_on, valid_move, attempt_pixel_on, game_won, i_won) IS
+    
+    
+    --BUTTON NOT PRESSED
+    
+    
+    --win check
+	b_win_check: PROCESS (board_status, try_pos, try_state, pixel_on, valid_move, blink_counter, in_clock, PS) IS
     BEGIN
-        IF (game_won = 0) THEN
-            IF (attempt_pixel_on = '0') THEN
-                IF (pixel_on = '0') THEN
-                    mycolor <= PIX_WHITE;
-                ELSE
-                    mycolor <= PIX_BLACK;
+        IF (PS = ST1) THEN
+            IF rising_edge(in_clock) THEN    
+                -- Check for winning conditions
+                FOR i IN 1 TO 3 LOOP
+                    -- Check cols
+                    IF (board_status(i) = board_status(i + 3) AND board_status(i + 3) = board_status(i + 6) AND board_status(i) /= E) THEN
+                        winner <= board_status(i);
+                        win_positions_col(i) <= '1';
+                        win_positions_col(i+3) <= '1';
+                        win_positions_col(i+6) <= '1';
+                    END IF;
+                
+                    -- Check rows
+                    IF (board_status(3*(i-1)+1) = board_status(3*(i-1)+2) AND board_status(3*(i-1)+2) = board_status(3*(i-1)+3) AND board_status(3*(i-1)+1) /= E) THEN
+                        winner <= board_status(i);
+                        win_positions_row(3*(i-1)+1) <= '1';
+                        win_positions_row(3*(i-1)+2) <= '1';
+                        win_positions_row(3*(i-1)+3) <= '1';
+                    END IF;
+                END loop;
+            
+            -- Check diagonals
+                IF (board_status(1) = board_status(5) AND board_status(5) = board_status(9) AND board_status(1) /= E) THEN
+                    winner <= board_status(5);
+                    win_positions_diag1(1) <= '1';
+                    win_positions_diag1(5) <= '1';
+                    win_positions_diag1(9) <= '1';
                 END IF;
-            ELSE
-                IF valid_move = '1' THEN
-                    IF blink_counter(25) = '1' THEN
-                        mycolor <= PIX_BLUE;
-                    ELSE
-                        IF (pixel_on = '0') THEN
-                            mycolor <= PIX_WHITE;
-                        ELSE
-                            mycolor <= PIX_BLACK;
-                        END IF;
-                    END IF;
-                ELSE
-                    IF blink_counter(25) = '1' THEN
-                        mycolor <= PIX_RED;
-                    ELSE
-                        IF (pixel_on = '0') THEN
-                            mycolor <= PIX_WHITE;
-                        ELSE
-                            mycolor <= PIX_BLACK;
-                        END IF;
-                    END IF;
+            
+                IF (board_status(3) = board_status(5) AND board_status(5) = board_status(7) AND board_status(3) /= E) THEN
+                    winner <= board_status(5);
+                    win_positions_diag2(3) <= '1';
+                    win_positions_diag2(5) <= '1';
+                    win_positions_diag2(7) <= '1';
+                END IF;
+            
+                win_positions <= (win_positions_col or win_positions_row) or (win_positions_diag1 or win_positions_diag2);
+                IF (win_positions /= "000000000") THEN
+                    game_won <= 1;
                 END IF;
             END IF;
         ELSE
-            IF (pixel_on = '0') THEN
-                mycolor <= PIX_WHITE;
-            ELSE
-                IF (game_won = 2) THEN
-                    mycolor <= PIX_YELLOW;
-                ELSE
-                    IF (i_won /= "000000000") THEN
-                        mycolor <= PIX_GREEN;
-                    ELSE
-                        IF (pixel_on = '0') THEN
-                            mycolor <= PIX_WHITE;
-                        ELSE
-                            mycolor <= PIX_BLACK;
-                        END IF;
-                    END IF;
-                END IF;
-            END IF;
-        END IF;
-        
-        IF (reset_game = '1') THEN
-            --FIXED
-    
-            Board_status <= (E,E,E,E,E,E,E,E,E);
-            Game_won <= 0;
-            i_won <= "000000000";
             game_won <= 0;
             winner <= E;
             win_positions_row <= "000000000";
@@ -537,85 +515,7 @@ END PROCESS Computer_Move;
             win_positions_diag1 <= "000000000";
             win_positions_diag2 <= "000000000";
             win_positions <= "000000000";
-            Player1_turn <= TRUE;
-    
-    
-            --RANDOMIZED
-    
-            Player1_value <= X;
-            Player2_value <= O;
-            Computer_value <= O;
-    
-            reset_game <= '1';
-    
-            -- Existing code for game display logic
-            -- logic for player-vs-computer 
         END IF;
-        
-        
-    END PROCESS;
-    
-    --win check
-	b_win_check: PROCESS (board_status, try_pos, try_state, pixel_on, valid_move, blink_counter) IS
-    BEGIN
-                
-                -- Check for winning conditions
-   FOR i IN 1 TO 3 LOOP
-        -- Check cols
-            IF (board_status(i) = board_status(i + 3) AND board_status(i + 3) = board_status(i + 6) AND board_status(i) /= E) THEN
-                winner <= board_status(i);
-                win_positions_col(i) <= '1';
-                win_positions_col(i+3) <= '1';
-                win_positions_col(i+6) <= '1';
-                game_won <= 1;
-            END IF;
-
-        -- Check rows
-            IF (board_status(3*(i-1)+1) = board_status(3*(i-1)+2) AND board_status(3*(i-1)+2) = board_status(3*(i-1)+3) AND board_status(3*(i-1)+1) /= E) THEN
-                winner <= board_status(i);
-                win_positions_row(3*(i-1)+1) <= '1';
-                win_positions_row(3*(i-1)+2) <= '1';
-                win_positions_row(3*(i-1)+3) <= '1';
-                game_won <= 1;
-            END IF;
-    END loop;
-
-    -- Check diagonals
-        IF (board_status(1) = board_status(5) AND board_status(5) = board_status(9) AND board_status(1) /= E) THEN
-            winner <= board_status(5);
-                win_positions_diag1(1) <= '1';
-                win_positions_diag1(5) <= '1';
-                win_positions_diag1(9) <= '1';
-                game_won <= 1;
-        END IF;
-    
-        IF (board_status(3) = board_status(5) AND board_status(5) = board_status(7) AND board_status(3) /= E) THEN
-            winner <= board_status(5);
-                win_positions_diag2(3) <= '1';
-                win_positions_diag2(5) <= '1';
-                win_positions_diag2(7) <= '1';
-                game_won <= 1;
-        END IF;
-
-    win_positions <= (win_positions_col or win_positions_row) or (win_positions_diag1 or win_positions_diag2);
-
-    END PROCESS;
-
-	b_am_i_a_winner: PROCESS(win_positions, pixel_on_9) IS
-    BEGIN
-        --pixel_on_9 states which of the 9 play positions this pixel might be a part of
-        --win_positions states which positions are winners
-        --check if this pixels position is one of the winners
-        
---        for index in 1 to 9 loop
---            IF (pixel_on_9(index) = win_positions(index) AND pixel_on_9(index) = '1') THEN
---                i_won <= '1';
---            ELSE
---                i_won <= '0';
---            END IF;
---        end loop;
-        
-        i_won <= pixel_on_9 AND win_positions; -- if i_won is all 0, either blakc or white, otherwise green
     END PROCESS;
     
     b_flip_player: PROCESS (in_clock, player1_turn, Player1_value, Player2_value) IS
@@ -630,54 +530,99 @@ END PROCESS Computer_Move;
     END PROCESS;
     
 	
-    update_board_process: PROCESS (user_val, board_status, try_pos, try_state, in_clock, key_press, swap_count, swap_vector)
-    BEGIN
-        IF rising_edge(in_clock) THEN
-            IF key_press = '1' THEN
-                IF user_val = "1101" AND game_won = 0 THEN  -- press D key
-                    IF board_status(try_pos) = E THEN  -- state not taken yet
-                        -- Confirm the move and update the board
-                        board_status(try_pos) <= try_state;
-            
-                        -- Switch player turns
-                        IF player1_turn THEN
-                            player1_turn <= FALSE;
-                        ELSE
-                            player1_turn <= TRUE;
-                        END IF;
-                        
---                        swap_count <= swap_count + 1;
---                        swap_vector <= conv_std_logic_vector(swap_count,2);
-                        
---                        if (swap_vector(0) = '0') THEN
---                            try_state <= X;
---                        else
---                            try_state <= O;
---                        end if;
-                        
---                        IF (flag = '0') THEN
---                            IF try_state = X THEN
---                                try_state <= O;
---                            ELSIF try_state = O THEN
---                                try_state <= X;
---                            END IF;
---                        END IF;
-                    END IF;
-                END IF;
-            END IF;
-        END IF;
-    END PROCESS update_board_process;
     
-    --REFERENCE:  https://stackoverflow.com/questions/27864903/with-select-statement-with-multiple-conditions-vhdl
-    WITH mycolor SELECT
-        red <= '1' when PIX_RED | PIX_PINK | PIX_YELLOW | PIX_WHITE,
-               '0' when others;
-    WITH mycolor SELECT
-        green <= '1' when PIX_GREEN | PIX_CYAN | PIX_YELLOW | PIX_WHITE,
-                 '0' when others;
-    WITH mycolor SELECT
-        blue <= '1' when PIX_BLUE | PIX_CYAN | PIX_PINK | PIX_WHITE,
-                '0' when others;
-        
+--    -- Declare a process for computer move
+--Computer_Move: PROCESS (board_status)
+--    VARIABLE rand_seed: INTEGER;
+--    VARIABLE ai_pos: INTEGER;
+--BEGIN
+--    -- Seed the random number generator
+--    -- 
+--    rand_seed := to_integer(unsigned(rand_seq(SEED)));
+
+--    -- Check if middle is available, choose it
+--    IF board_status(5) = E THEN
+--        ai_pos := 5;
+--    ELSE
+--        -- Check if corners are available, choose one randomly
+--        ai_pos := (rand_seed mod 4) * 2 + 1;
+--        IF board_status(ai_pos) /= E THEN
+--            ai_pos := ai_pos + 2;
+--            IF board_status(ai_pos) /= E THEN
+--                ai_pos := ai_pos + 2;
+--                IF board_status(ai_pos) /= E THEN
+--                    ai_pos := ai_pos + 2;
+--                END IF;
+--            END IF;
+--        END IF;
+--    END IF;
+
+--    -- Check win/defend condition
+--    -- (1-3), (4-6), (7-9) rows
+--    FOR i IN 1 TO 7 STEP 3 LOOP
+--        IF (board_status(i) = board_status(i + 1) AND board_status(i) /= E) OR
+--           (board_status(i + 1) = board_status(i + 2) AND board_status(i + 1) /= E) OR
+--           (board_status(i) = board_status(i + 2) AND board_status(i) /= E) THEN
+--            -- Win or defend
+--            IF board_status(i) = E THEN
+--                ai_pos := i;
+--            ELSIF board_status(i + 1) = E THEN
+--                ai_pos := i + 1;
+--            ELSE
+--                ai_pos := i + 2;
+--            END IF;
+--            EXIT; -- Break out of loop if a move is found
+--        END IF;
+--    END LOOP;
+
+--    -- (1,4,7), (2,5,8), (3,6,9) columns
+--    FOR i IN 1 TO 3 LOOP
+--        IF (board_status(i) = board_status(i + 3) AND board_status(i) /= E) OR
+--           (board_status(i + 3) = board_status(i + 6) AND board_status(i + 3) /= E) OR
+--           (board_status(i) = board_status(i + 6) AND board_status(i) /= E) THEN
+--            -- Win or defend
+--            IF board_status(i) = E THEN
+--                ai_pos := i;
+--            ELSIF board_status(i + 3) = E THEN
+--                ai_pos := i + 3;
+--            ELSE
+--                ai_pos := i + 6;
+--            END IF;
+--            EXIT; -- Break out of loop if a move is found
+--        END IF;
+--    END LOOP;
+
+--    -- (1,5,9), (3,5,7) diagonals
+--    IF (board_status(1) = board_status(5) AND board_status(1) /= E) OR
+--       (board_status(5) = board_status(9) AND board_status(5) /= E) OR
+--       (board_status(1) = board_status(9) AND board_status(1) /= E) THEN
+--        -- Win or defend
+--        IF board_status(1) = E THEN
+--            ai_pos := 1;
+--        ELSIF board_status(5) = E THEN
+--            ai_pos := 5;
+--        ELSE
+--            ai_pos := 9;
+--        END IF;
+--    ELSIF (board_status(3) = board_status(5) AND board_status(3) /= E) OR
+--          (board_status(5) = board_status(7) AND board_status(5) /= E) OR
+--          (board_status(3) = board_status(7) AND board_status(3) /= E) THEN
+--        -- Win or defend
+--        IF board_status(3) = E THEN
+--            ai_pos := 3;
+--        ELSIF board_status(5) = E THEN
+--            ai_pos := 5;
+--        ELSE
+--            ai_pos := 7;
+--        END IF;
+--    END IF;
+
+--    -- Make the move
+--    IF board_status(ai_pos) = E THEN
+--        board_status(ai_pos) <= COMPUTER_LETTER;
+--    END IF;
+
+--END PROCESS Computer_Move;
+
         
 END Behavioral;
