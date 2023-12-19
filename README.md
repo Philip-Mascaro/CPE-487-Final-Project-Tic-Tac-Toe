@@ -1,5 +1,5 @@
 # CPE-487-Final-Project-Tic-Tac-Toe
-### 1. Description
+## 1. Description
   * The program will create a playable game of Tic-Tac-Toe that can be played in either a player versus player mode or a player versus computer mode.
   *  To play the game you will need a Nexys Board, a keypad and a monitor to display the game.
      ![photo of keypad](/Images/keypad.jpg)
@@ -8,33 +8,26 @@
   * [Add Description of Board and how to do the reset]
   * [Block Diagram for how the files work together]
 
-### 2. Modifications
+## 2. Modifications
  * Utilized Lab 3 as the base framework for the game.
  * Utilized the keypad.vhdl file from Lab 4 and placed the keypad module in the vga_top.
 
-### 3. Summary of Steps
+## 3. Summary of Steps
 * [desmos link for drawing X and O](https://www.desmos.com/calculator/irfxf6ciac)
 
-### 4. Conclusion
-## Submission:
-* Your final submission should be a github repository of very similar format to the labs themselves with an opening README document with the expected components as follows:
-	* A description of the expected behavior of the project, attachments needed (speaker module, VGA connector, etc.), related images/diagrams, etc.
-		* The more detailed the better – you all know how much I love a good finite state machine and Boolean logic, so those could be some good ideas if appropriate for your system. If not, some kind of high level block diagram showing how different parts of your program connect together and/or showing how what you have created might fit into a more complete system could be appropriate instead.
-	* A summary of the steps to get the project to work in Vivado and on the Nexys board
-	* Images and/or videos of the project in action interspersed throughout to provide context
-	* “Modifications”
-		* If building on an existing lab or expansive starter code of some kind, describe your “modifications” – the changes made to that starter code to improve the code, create entirely new functionalities, etc. Please share any starter code used as well.
-		* If you truly created your code/project from scratch, describe that in brief here.
-	* Conclude with a summary of the process itself – who was responsible for what components (preferably also shown by each person contributing to the github repository!), the timeline of work completed, any difficulties encountered and how they were solved, etc.
-* And of course, the code itself separated into appropriate .vhd and .xdc files.
-* You are not really expected to be github experts – as long as one of you can confidently create the repository and help others add to it, that should be sufficient. If no group members fall under this criteria, discuss with me as soon as possible.
+## 4. Conclusion
+* Philip Mascaro was in charge of the graphical display for the game as well as the ability for the player to select their move. He also performed error fixing for various processes of the gameboard such as the resetting and tie functions.
+* Jett Tinik worked on the adding in the ability for players to conform their moves, the ability to switch between the two players, and the computer opponent.
+* Jeffrey Tharakan created the win conditions and the ability for players to reset the game and choose whether they want to do a player versus player game or a player versus computer game.
+### Timeline
+* Week 1: create the graphical display
+* Week 2: add in move selection and confirmation
+* Week 3: add in win conditions and the ability to reset the game 
+* Week 4: Fix issues with tie condition and add in computer opponent for player versus computer mode
+### Problems
+* "Ghost Signals" Slightly hidden signals were registering on the display.
+* Tie condition was having mutliple errors icnluding having the "O" signals appearing white in the display when they should have been black
+ntation with all components.
 
-Additionally, as discussed in class, you’ll be expected to give a demonstration + presentation during the final exam period. This can take the form of a live demonstration + informal discussion (the encouraged option in most situations that will be given more leeway from any technical difficulties), or a pre-created video including the project in action + slides describing much of the same content as the github submission (a backup option primarily for groups that will be missing multiple members during the final exam period).
-
-## Extra Notes:
-
-* If you need a single copy of any of the hardware (attachments) we use during the course, that should not be an issue. If you need multiple copies, there may be some “wait and see” situations and/or you may have minimal time to test the full implementation with all components.
-* For more complex projects that would require hardware that you do not already readily have access to, it is sufficient to model the desired final system in some way. For example, showing the output of a controller for a microwave or other digital system on the LCD screen instead of actually controlling a microwave.
-	* That said, if you already own these needed components, by all means use them!
 * If you are still “attached” to a particular lab (calculator, pong, etc.), you may still explore these areas further with additional functionality (many more operations for a calculator, multiple players or other modifications for pong, etc.)
 	* However, the above would fall under the “simple” category for project complexity. “Simple” projects (especially for groups of 3 students) will face additional scrutiny in the documentation and code. This isn’t meant to be a deterrent, but it is only fair that more ambitious projects have a bit more leeway if one section of the code isn’t working as anticipated, the documentation is a little sparse, etc.
