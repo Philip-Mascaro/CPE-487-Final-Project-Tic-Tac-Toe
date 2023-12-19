@@ -16,6 +16,7 @@
 * [desmos link for drawing X and O](https://www.desmos.com/calculator/irfxf6ciac)
 
 ## 4. Conclusion
+### Task Breakdown
 * Philip Mascaro was in charge of the graphical display for the game as well as the ability for the player to select their move. He also performed error fixing for various processes of the gameboard such as the resetting and tie functions.
 * Jett Tinik worked on the adding in the ability for players to conform their moves, the ability to switch between the two players, and the computer opponent.
 * Jeffrey Tharakan created the win conditions and the ability for players to reset the game and choose whether they want to do a player versus player game or a player versus computer game.
