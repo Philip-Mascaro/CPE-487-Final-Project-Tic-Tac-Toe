@@ -3,7 +3,9 @@
   * The program will create a playable game of Tic-Tac-Toe that can be played in either a player versus player mode or a player versus computer mode.
   *  To play the game you will need a Nexys Board, a keypad and a monitor to display the game.
      ![photo of keypad](/Images/keypad.jpg)
-  * [Add Description for how to use buttons to]
+     
+  * Buttons 1-9 represent each quadrant of our tic tac toe board with 1 being the top left, and 9 being the bottom right. This spot will either turn red to signify an occupied space or blink with the current player's letter to signify an open space. If, the space is open pressing the D key will confirm the move.
+   
   * ![photo of keypad](/Images/board.jpg)
   * [Add Description of Board and how to do the reset]
   * [Block Diagram for how the files work together]
