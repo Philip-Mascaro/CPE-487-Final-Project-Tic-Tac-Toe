@@ -26,6 +26,7 @@
 * Week 3: add in win conditions and the ability to reset the game 
 * Week 4: Fix issues with tie condition and add in computer opponent for player versus computer mode
 ### Problems
-* "Ghost Signals" Slightly hidden signals were registering on the display.
+* "Ghost Signals" Slightly hidden player moves that were registering on the display, but only on some monitors. Was impacting the win conditions of the game because the hidden signals were interacting with the visible ones.
+* Reset buttons needed to have the signals they were resetting into different processes to avoid driver issues
 * Tie condition was having mutliple errors icnluding having the "O" signals appearing white in the display when they should have been black
 ntation with all components.
