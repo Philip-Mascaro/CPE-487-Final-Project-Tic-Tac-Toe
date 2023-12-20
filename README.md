@@ -18,6 +18,20 @@ Connections of the processes on the inside of game_board.vhd
 
 ![Block Diagram for how the Processes work together](/Images/487_Block_Diagram_Processes.jpg)
 
+* SYNC_PROC: controls the finite state machhine connected to resetting the game
+* b_tie_board_update: updates a signal that stores which positions of the board have been played
+* b_is_tied: checks if all positions of the board are filled in
+* b_game_tie_sum: updates a signal based on if the game has a winner and if the board is full
+* update_board_process: sets the player order upon reset; during the game will update the board based on valid cell selections (by player or computer) and switch which player is active
+* bdraw: states if a pixel is on or not based on if the board cell is an X, an O, or Empty; repeats the process for the attempted move and states if it is an attempted pixel on; also sets a signal if the pixel is in the top left 50x50 of the screen
+* b_set_board: states which color each pixel should be based on if the game is running, if there is a win or a tie, and if there is an attempted move being played at that spot (note that the top left 50x50 of the screen is set to the parity of the computer's next attempt)
+* 
+
+
+
+
+note: There is another process called "b_is_finished" that was used during testing that updates a signal only used in a sensitivity list. We did not remove it to make sure we did not introduce any random glitches into the code.
+
 ## 2. Modifications
  * Utilized Lab 3 as the base framework for the game.
  * Utilized the keypad.vhdl file from Lab 4 and placed the keypad module in the vga_top.
