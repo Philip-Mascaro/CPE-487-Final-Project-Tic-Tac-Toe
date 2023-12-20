@@ -58,9 +58,9 @@
 * Week 4: Fix issues with tie condition and add in computer opponent for player versus computer mode
   * find a working randomizer and hardcode our computer logic into the program
 ### Problems
-* "Ghost Signals" Slightly hidden player moves that were registering on the display, but only on some monitors. Was impacting the win conditions of the game because the hidden signals were interacting with the visible ones.
+* "Ghost Signals": slightly hidden player moves that were registering on the display, but only on some monitors. Was impacting the win conditions of the game because the hidden signals were interacting with the visible ones.
 * Reset buttons needed to have the signals they were resetting into different processes to avoid driver issues
 * Tie condition was having mutliple errors including having the "O" signals appearing white in the display when they should have been black
 ntation with all components.
 * All of the VHDL random number generators we found either only worked in testbench or gave errors in Vivado. Eventually, we ended up using a random number generator with our own seed number (487) and we could not use it for our computer.
-*  Issues with delay in the Computer Mode. Computer will sometimes play multiple times in a turn. It would also play a move even after losing causing a double win because it would move faster than the win signal
+*  Issues with delay in the Computer Mode. Computer will sometimes play multiple times in a turn. It would also play a move even after losing causing a double win because it would move faster than the win signal.
