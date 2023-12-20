@@ -11,9 +11,11 @@
   * Our board simplifies the game experience. Use BTNU for player vs computer, BTND for player vs player. X and O are randomly assigned; choose before the game to determine the starting player. Press BTNU or BTND to reset the Tic-Tac-Toe game.
 
 Connections of the diferent files:
+
 ![Block Diagram for how the files work together](/Images/487_Block_Diagram.png)
 
 Connections of the processes on the inside of game_board.vhd
+
 ![Block Diagram for how the Processes work together](/Images/487_Block_Diagram_Processes.jpg)
 
 ## 2. Modifications
