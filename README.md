@@ -15,19 +15,18 @@
 ## 2. Modifications
  * Utilized Lab 3 as the base framework for the game.
  * Utilized the keypad.vhdl file from Lab 4 and placed the keypad module in the vga_top.
- * List where we got the randomization code from!!!
+ * Randomizer Code with seed [random number logic ](https://en.wikipedia.org/wiki/Linear_congruential_generator)
  * For the computer turn-based moves we just started from general game logic. What are commonly used strategies when playing and how to react to winning situations when they arise? After considering these we wrote this sudo code. Once the syntax is solid we set the move location determined by the logic to a signal to be dealt with for move confirmation.
    > If the middle is open take it
    > If not go for the corners
    > If there are two letters in any section with a space (win check)
    > Move there (Block or win that section)
    > Elsif plays a random move
-* Switched to dumb computer after issues
-
+* Switched to the dumb computer after issues with the randomizer happening to fast
+  > Randomizer still used for who plays first
+* X and O pixel logic [desmos link for drawing X and O](https://www.desmos.com/calculator/irfxf6ciac)
 
 ## 3. Summary of Steps
-*  Would this go here -> [desmos link for drawing X and O](https://www.desmos.com/calculator/irfxf6ciac)
-  
 ### a. Create a new RTL project siren in Vivado Quick Start
 * Create six new source files of file type VHDL called clk_wiz_0, clk_wiz_0_wiz, game_board, keypad, vga_sync, and vga_top
 * Create a new constraint file of file type XDC called vga_top
@@ -45,7 +44,7 @@
 ### e. Hardware Setup
 * Connect the keypad to the nexys board [which port] with the tongs going into the top half. Then connect the vga cable to the board and the VGA-compatible TV.
 
-## 5. Conclusion
+## 4. Conclusion
 ### Task Breakdown
 * Philip Mascaro was in charge of the graphical display for the game as well as the ability for the player to select their move. He also performed error fixing for various processes of the gameboard such as the resetting and tie functions.
 * Jett Tinik worked on adding in the ability for players to conform their moves, the ability to switch between the two players, and the computer opponent.
