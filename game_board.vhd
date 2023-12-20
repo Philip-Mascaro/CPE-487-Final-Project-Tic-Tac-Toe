@@ -824,31 +824,178 @@ BEGIN
     
 --    END PROCESS Computer_Move;
 
-    dumb_Computer_Move: PROCESS (board_status, blink_counter) IS
+--    dumb_Computer_Move: PROCESS (board_status, blink_counter) IS
+--    begin
+--        IF (blink_counter(25)= '0') THEN
+--            if board_status(1) = E THEN
+--                ai_pos <= 1;
+--            elsif board_status(2) = E THEN
+--                ai_pos <= 2;
+--            elsif board_status(3) = E THEN
+--                ai_pos <= 3;
+--            elsif board_status(4) = E THEN
+--                ai_pos <= 4;
+--            elsif board_status(5) = E THEN
+--                ai_pos <= 5;
+--            elsif board_status(6) = E THEN
+--                ai_pos <= 6;
+--            elsif board_status(7) = E THEN
+--                ai_pos <= 7;
+--            elsif board_status(8) = E THEN
+--                ai_pos <= 8;
+--            elsif board_status(9) = E THEN
+--                ai_pos <= 9;
+--            end if;
+--        end if;
+--    end process;
+    
+    smart_Computer_Move: PROCESS (board_status, blink_counter) IS
     begin
         IF (blink_counter(25)= '0') THEN
-            if board_status(1) = E THEN
-                ai_pos <= 1;
-            elsif board_status(2) = E THEN
-                ai_pos <= 2;
-            elsif board_status(3) = E THEN
-                ai_pos <= 3;
-            elsif board_status(4) = E THEN
-                ai_pos <= 4;
-            elsif board_status(5) = E THEN
+               IF (board_status(1) = board_status(2) AND board_status(1) /= E AND board_status(3) = E) THEN ai_pos <= 3;
+            ELSIF (board_status(1) = board_status(3) AND board_status(1) /= E AND board_status(2) = E) THEN ai_pos <= 2;
+            ELSIF (board_status(2) = board_status(3) AND board_status(2) /= E AND board_status(1) = E) THEN ai_pos <= 1;
+            
+            ELSIF (board_status(4) = board_status(5) AND board_status(4) /= E AND board_status(6) = E) THEN ai_pos <= 6;
+            ELSIF (board_status(4) = board_status(6) AND board_status(4) /= E AND board_status(5) = E) THEN ai_pos <= 5;
+            ELSIF (board_status(5) = board_status(6) AND board_status(5) /= E AND board_status(4) = E) THEN ai_pos <= 4;
+            
+            ELSIF (board_status(7) = board_status(8) AND board_status(7) /= E AND board_status(9) = E) THEN ai_pos <= 9;
+            ELSIF (board_status(7) = board_status(9) AND board_status(7) /= E AND board_status(8) = E) THEN ai_pos <= 8;
+            ELSIF (board_status(8) = board_status(9) AND board_status(8) /= E AND board_status(7) = E) THEN ai_pos <= 7;
+            
+            
+            ELSIF (board_status(1) = board_status(4) AND board_status(1) /= E AND board_status(7) = E) THEN ai_pos <= 7;
+            ELSIF (board_status(1) = board_status(7) AND board_status(1) /= E AND board_status(4) = E) THEN ai_pos <= 4;
+            ELSIF (board_status(4) = board_status(7) AND board_status(4) /= E AND board_status(1) = E) THEN ai_pos <= 1;
+            
+            ELSIF (board_status(2) = board_status(5) AND board_status(2) /= E AND board_status(8) = E) THEN ai_pos <= 8;
+            ELSIF (board_status(2) = board_status(8) AND board_status(2) /= E AND board_status(5) = E) THEN ai_pos <= 5;
+            ELSIF (board_status(5) = board_status(8) AND board_status(5) /= E AND board_status(2) = E) THEN ai_pos <= 2;
+            
+            ELSIF (board_status(3) = board_status(6) AND board_status(3) /= E AND board_status(9) = E) THEN ai_pos <= 9;
+            ELSIF (board_status(3) = board_status(9) AND board_status(3) /= E AND board_status(6) = E) THEN ai_pos <= 6;
+            ELSIF (board_status(6) = board_status(9) AND board_status(6) /= E AND board_status(3) = E) THEN ai_pos <= 3;
+            
+            
+            ELSIF (board_status(1) = board_status(5) AND board_status(1) /= E AND board_status(9) = E) THEN ai_pos <= 9;
+            ELSIF (board_status(1) = board_status(9) AND board_status(1) /= E AND board_status(5) = E) THEN ai_pos <= 5;
+            ELSIF (board_status(5) = board_status(9) AND board_status(5) /= E AND board_status(1) = E) THEN ai_pos <= 1;
+            
+            ELSIF (board_status(3) = board_status(5) AND board_status(3) /= E AND board_status(7) = E) THEN ai_pos <= 7;
+            ELSIF (board_status(3) = board_status(7) AND board_status(3) /= E AND board_status(5) = E) THEN ai_pos <= 5;
+            ELSIF (board_status(5) = board_status(7) AND board_status(5) /= E AND board_status(1) = E) THEN ai_pos <= 3;
+--           IF (board_status(1) = board_status(2) AND board_status(1) /= E) OR
+--           (board_status(2) = board_status(3) AND board_status(2) /= E) OR
+--           (board_status(1) = board_status(3) AND board_status(1) /= E) THEN
+--           -- Win or defend
+--               IF board_status(1) = E THEN
+--                    ai_pos <= 1;
+--               ELSIF board_status(2) = E THEN
+--                    ai_pos <= 2;
+--               ELSE
+--                    ai_pos <= 3;
+--               END IF;
+--            ELSIF (board_status(4) = board_status(5) AND board_status(4) /= E) OR
+--               (board_status(5) = board_status(6) AND board_status(5) /= E) OR
+--               (board_status(4) = board_status(6) AND board_status(4) /= E) THEN
+--                -- Win or defend
+--                IF board_status(4) = E THEN
+--                    ai_pos <= 4;
+--                ELSIF board_status(5) = E THEN
+--                    ai_pos <= 5;
+--                ELSE
+--                    ai_pos <= 6;
+--                END IF;
+--             ELSIF (board_status(7) = board_status(8) AND board_status(7) /= E) OR
+--               (board_status(8) = board_status(9) AND board_status(8) /= E) OR
+--               (board_status(7) = board_status(9) AND board_status(7) /= E) THEN
+--                -- Win or defend
+--                IF board_status(7) = E THEN
+--                    ai_pos <= 7;
+--                ELSIF board_status(8) = E THEN
+--                    ai_pos <= 8;
+--                ELSE
+--                    ai_pos <= 9;
+--                END IF;
+--            ELSIF (board_status(1) = board_status(4) AND board_status(1) /= E) OR
+--               (board_status(4) = board_status(7) AND board_status(4) /= E) OR
+--               (board_status(1) = board_status(7) AND board_status(1) /= E) THEN
+--                -- Win or defend
+--                IF board_status(1) = E THEN
+--                    ai_pos <= 1;
+--                ELSIF board_status(4) = E THEN
+--                    ai_pos <= 4;
+--                ELSE
+--                    ai_pos <= 7;
+--                END IF;
+--            ELSIF (board_status(2) = board_status(5) AND board_status(2) /= E) OR
+--               (board_status(5) = board_status(8) AND board_status(5) /= E) OR
+--               (board_status(2) = board_status(8) AND board_status(2) /= E) THEN
+--                -- Win or defend
+--                IF board_status(2) = E THEN
+--                    ai_pos <= 2;
+--                ELSIF board_status(5) = E THEN
+--                    ai_pos <= 5;
+--                ELSE
+--                    ai_pos <= 8;
+--                END IF;
+--            ELSIF (board_status(3) = board_status(6) AND board_status(3) /= E) OR
+--               (board_status(6) = board_status(9) AND board_status(6) /= E) OR
+--               (board_status(3) = board_status(9) AND board_status(3) /= E) THEN
+--                -- Win or defend
+--                IF board_status(3) = E THEN
+--                    ai_pos <= 3;
+--                ELSIF board_status(6) = E THEN
+--                    ai_pos <= 6;
+--                ELSE
+--                    ai_pos <= 9;
+--                END IF;
+--            ELSIF (board_status(1) = board_status(5) AND board_status(1) /= E) OR
+--               (board_status(5) = board_status(9) AND board_status(5) /= E) OR
+--               (board_status(1) = board_status(9) AND board_status(1) /= E) THEN
+--                -- Win or defend
+--                IF board_status(1) = E THEN
+--                    ai_pos <= 1;
+--                ELSIF board_status(5) = E THEN
+--                    ai_pos <= 5;
+--                ELSE
+--                    ai_pos <= 9;
+--                END IF;
+--            ELSIF (board_status(3) = board_status(5) AND board_status(3) /= E) OR
+--               (board_status(5) = board_status(7) AND board_status(5) /= E) OR
+--               (board_status(3) = board_status(7) AND board_status(3) /= E) THEN
+--                -- Win or defend
+--                IF board_status(3) = E THEN
+--                    ai_pos <= 3;
+--                ELSIF board_status(5) = E THEN
+--                    ai_pos <= 5;
+--                ELSE
+--                    ai_pos <= 7;
+--                END IF;
+            ELSIF board_status(5) = E THEN
                 ai_pos <= 5;
-            elsif board_status(6) = E THEN
-                ai_pos <= 6;
-            elsif board_status(7) = E THEN
+            ELSIF board_status(1) = E THEN
+                ai_pos <= 1;
+            ELSIF board_status(3) = E THEN
+                ai_pos <= 3;
+            ELSIF board_status(7) = E THEN
                 ai_pos <= 7;
-            elsif board_status(8) = E THEN
-                ai_pos <= 8;
-            elsif board_status(9) = E THEN
+            ELSIF board_status(9) = E THEN
                 ai_pos <= 9;
-            end if;
+            ELSIF board_status(2) = E THEN
+                ai_pos <= 2;
+            ELSIF board_status(4) = E THEN
+                ai_pos <= 4;
+            ELSIF board_status(6) = E THEN
+                ai_pos <= 6;
+            ELSIF board_status(8) = E THEN
+                ai_pos <= 8;
+            END IF;
         end if;
     end process;
-        
+    
+    
 --    rand_Computer_Move: PROCESS (board_status, blink_counter, my_seed) IS
 --    variable rand_temp : integer;
 --    begin
