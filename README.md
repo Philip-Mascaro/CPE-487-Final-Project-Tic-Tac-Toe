@@ -22,6 +22,7 @@
    > If there are two letters in any section with a space (win check)
    > Move there (Block or win that section)
    > Elsif plays a random move
+* Switched to dumb computer after issues
 
 
 ## 3. Summary of Steps
