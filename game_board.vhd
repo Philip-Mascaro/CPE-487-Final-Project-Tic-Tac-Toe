@@ -193,7 +193,8 @@ BEGIN
         end if;
     END PROCESS;
     
-    update_board_process: PROCESS (user_val, board_status, try_pos, try_state, in_clock, key_press, swap_count, swap_vector, PS, ai_pos, Computer_value, Comp_opp, game_tie_sum, blink_counter)
+    update_board_process: PROCESS (user_val, board_status, try_pos, try_state, in_clock, key_press, swap_count, swap_vector, PS, ai_pos, Computer_value, Comp_opp, game_tie_sum, blink_counter, my_seed)
+    variable my_rand: integer;
     BEGIN
         IF PS = ST0 THEN
             --FIXED
@@ -202,11 +203,24 @@ BEGIN
     
     
             --RANDOMIZED
-    
-            Player1_value <= X;
-            Player2_value <= O;
-            Computer_value <= O;
-    
+            my_rand := my_seed mod 4;
+            if my_rand = 0 THEN
+                Player1_value <= X;
+                Player2_value <= O;
+                Computer_value <= O;
+            elsif  my_rand = 1 THEN
+                Player1_value <= O;
+                Player2_value <= X;
+                Computer_value <= O;
+            elsif  my_rand = 2 THEN
+                Player1_value <= O;
+                Player2_value <= X;
+                Computer_value <= X;
+            else
+                Player1_value <= X;
+                Player2_value <= O;
+                Computer_value <= X;
+            end if;
     
             -- Existing code for game display logic
             -- logic for player-vs-computer 
@@ -810,7 +824,7 @@ BEGIN
     
 --    END PROCESS Computer_Move;
 
-    Computer_Move: PROCESS (board_status, blink_counter) IS
+    dumb_Computer_Move: PROCESS (board_status, blink_counter) IS
     begin
         IF (blink_counter(25)= '0') THEN
             if board_status(1) = E THEN
@@ -835,4 +849,14 @@ BEGIN
         end if;
     end process;
         
+--    rand_Computer_Move: PROCESS (board_status, blink_counter, my_seed) IS
+--    variable rand_temp : integer;
+--    begin
+--        rand_temp := ((my_seed mod 9)+1);
+--        if board_status(rand_temp) = E THEN
+--            IF (blink_counter(25)= '0') AND (rising_edge(blink_counter(24))) THEN
+--                ai_pos <= rand_temp;
+--            end if;
+--        end if;
+--    end process;
 END Behavioral;
