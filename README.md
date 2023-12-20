@@ -4,7 +4,7 @@
   *  To play the game you will need a Nexys Board, a keypad, and a monitor to display the game.
      ![photo of keypad](/Images/keypad.jpg)
      
-  * Our Tic-Tac-Toe board uses buttons 1-9 for each quadrant. 1 is top left, 9 is bottom right. A red blinking letter indicates an occupied space, while a blue blinking letter shows an open space for the current player's turn. Pressing the D key confirms an open space move.
+  * Our Tic-Tac-Toe board uses buttons 1-9 for each board cell. 1 is top left, 9 is bottom right. A red blinking letter indicates an occupied space, while a blue blinking letter shows an open space for the current player's turn. Pressing the D key confirms an open space move.
    
    ![photo of board](/Images/board.jpg)
  
