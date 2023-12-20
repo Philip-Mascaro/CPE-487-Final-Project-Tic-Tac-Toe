@@ -50,13 +50,14 @@
 * Jett Tinik worked on adding in the ability for players to confirm their moves, the ability to switch between the two players, and the computer opponent.
 * Jeffrey Tharakan created the win conditions and the ability for players to reset the game and choose whether they want to do a player versus player game or a player versus computer game.
 ### Timeline
-* Week 1: create the graphical display, made a google doc to divvy up the work and keep track of code
+* Week 1: create the graphical display, made a google doc to divide up the work and keep track of code
 * Week 2: add in move selection and confirmation
   * troubleshoot move selection and graphical displays
   * add blinking and coloring to the letters
 * Week 3: add in win conditions and the ability to reset the game 
 * Week 4: Fix issues with tie condition and add in computer opponent for player versus computer mode
   * find a working randomizer and hardcode our computer logic into the program
+  * Add in the ability to choose whether you want to play as X or O
 ### Problems
 * "Ghost Signals": slightly hidden player moves that were registering on the display, but only on some monitors. Was impacting the win conditions of the game because the hidden signals were interacting with the visible ones.
 * Reset buttons needed to have the signals they were resetting into different processes to avoid driver issues
