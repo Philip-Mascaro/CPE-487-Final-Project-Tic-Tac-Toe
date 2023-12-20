@@ -12,7 +12,7 @@
 
 Connections of the diferent files:
 
-![Block Diagram for how the files work together](/Images/487_Block_Diagram.png)
+![Block Diagram for how the files work together](/Images/487_Block_Diagram.jpg)
 
 Connections of the processes on the inside of game_board.vhd
 
