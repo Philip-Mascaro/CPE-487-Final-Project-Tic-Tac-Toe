@@ -42,7 +42,7 @@
 * Click 'Program Device' then xc7a100t_0 to download siren.bit to the Nexys A7-100T board
 
 ### e. Hardware Setup
-* Connect the keypad to the nexys board [which port] with the tongs going into the top half. Then connect the vga cable to the board and the VGA-compatible TV.
+* Connect the keypad KYPD to the nexys board PMOD PORT JA with the tongs going into the top half. Then connect the vga cable to the board's VGA port and a VGA-compatible TV.
 
 ## 4. Conclusion
 ### Task Breakdown
