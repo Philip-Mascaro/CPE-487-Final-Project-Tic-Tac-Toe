@@ -63,3 +63,4 @@
 * Tie condition was having mutliple errors including having the "O" signals appearing white in the display when they should have been black
 ntation with all components.
 * All of the VHDL random number generators we found either only worked in testbench or gave errors in Vivado. Eventually, we ended up using a random number generator with our own seed number (487) and we could not use it for our computer.
+*  Issues with delay in the Computer Mode. Computer will sometimes play multiple times in a turn. It would also play a move even after losing causing a double win because it would move faster than the win signal
