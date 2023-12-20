@@ -115,7 +115,7 @@ ARCHITECTURE Behavioral OF game_board IS
 	
 	SIGNAL rand_seed: INTEGER;
     SIGNAL ai_pos: INTEGER;
-    SIGNAL my_seed: INTEGER;
+    SIGNAL my_seed: INTEGER := 487;
     SIGNAL out_value: real;
     type int_array2 is array(1 to 8) of INTEGER;
     SIGNAL corner_array : int_array2 := (1,3,7,9,1,3,7,9);
@@ -125,6 +125,10 @@ ARCHITECTURE Behavioral OF game_board IS
     SIGNAL temp2 : real;
     signal temp: STD_LOGIC;
     signal Qt: STD_LOGIC_VECTOR(7 downto 0) := x"01";
+    
+    SIGNAL rand_a: INTEGER := 75;
+    SIGNAL rand_c: INTEGER := 74;
+    SIGNAL rand_m: INTEGER := 65537;
 	
 BEGIN
 
@@ -189,7 +193,7 @@ BEGIN
         end if;
     END PROCESS;
     
-    update_board_process: PROCESS (user_val, board_status, try_pos, try_state, in_clock, key_press, swap_count, swap_vector, PS, ai_pos, Computer_value, Comp_opp, game_tie_sum)
+    update_board_process: PROCESS (user_val, board_status, try_pos, try_state, in_clock, key_press, swap_count, swap_vector, PS, ai_pos, Computer_value, Comp_opp, game_tie_sum, blink_counter)
     BEGIN
         IF PS = ST0 THEN
             --FIXED
@@ -209,17 +213,20 @@ BEGIN
             NS <= ST1;
         ELSE
            IF rising_edge(in_clock) THEN
---                IF ( (try_state = Computer_value) and (Comp_opp = '1') and (game_tie_sum = 0)) THEN
---                    IF board_status(ai_pos) = E THEN
---                        board_status(ai_pos) <= try_state;
-                    
---                        IF P_PLAYER = ST0 THEN
---                            N_PLAYER <= ST1;
---                        ELSE
---                            N_PLAYER <= ST0;
---                        END IF;
---                    end if;
---                else
+                IF ( (try_state = Computer_value) and (Comp_opp = '1') and (game_tie_sum = 0)) THEN
+                    IF (blink_counter(25)= '1') THEN
+                        if board_status(ai_pos) = E then
+                            board_status(ai_pos) <= try_state;
+                        
+                            IF player1_turn THEN
+                                player1_turn <= FALSE;
+                            ELSE
+                                player1_turn <= TRUE;
+                            END IF;
+                        END IF;
+                        
+                    END IF;
+                else
                     IF key_press = '1' THEN
                         IF user_val = "1101" AND game_won = 0 THEN  -- press D key
                             IF board_status(try_pos) = E THEN  -- state not taken yet
@@ -235,7 +242,7 @@ BEGIN
                             END IF;
                         END IF;
                     END IF;
---                END IF;
+                END IF;
            END IF;
         END IF;
     END PROCESS update_board_process;
@@ -332,7 +339,7 @@ BEGIN
     END PROCESS;
     
     
-    b_set_board: PROCESS (pixel_on, valid_move, attempt_pixel_on, game_won, i_won, in_clock, reset_pvp, reset_pve, pos_played, is_tied, game_finished, GAME_TIE_SUM) IS
+    b_set_board: PROCESS (pixel_on, valid_move, attempt_pixel_on, game_won, i_won, in_clock, reset_pvp, reset_pve, pos_played, is_tied, game_finished, GAME_TIE_SUM, ai_pos) IS
     BEGIN
         IF (button_visual = '1') THEN
 --                IF (reset_pvp = '1') THEN
@@ -356,7 +363,7 @@ BEGIN
 --            ELSE
 --                mycolor <= PIX_WHITE;
 --            END IF;
-            IF (is_tied = 1) then
+            IF ((ai_pos mod 2) = 1) then --is_tied
                 mycolor <= PIX_BLACK;
             ELSE
                 mycolor <= PIX_YELLOW;
@@ -667,133 +674,165 @@ BEGIN
 
 
 -- REFERENCE:  https://stackoverflow.com/questions/43081067/pseudo-random-number-generator-using-lfsr-in-vhdl
-    rand_num_gen: process(PS, Qt, in_clock) IS
-    variable tmp : STD_LOGIC := '0';
-    BEGIN
+--    rand_num_gen: process(PS, Qt, in_clock) IS
+--    variable tmp : STD_LOGIC := '0';
+--    BEGIN
     
-        IF PS = ST0 THEN
-            Qt <= x"01"; 
-        ELSE
-            tmp := Qt(4) XOR Qt(3) XOR Qt(2) XOR Qt(0);
-            Qt <= tmp & Qt(7 downto 1);
-        end if;
-        my_seed <= conv_integer(Qt);
-     end process;
+--        IF PS = ST0 THEN
+--            Qt <= x"01"; 
+--        ELSE
+--            tmp := Qt(4) XOR Qt(3) XOR Qt(2) XOR Qt(0);
+--            Qt <= tmp & Qt(7 downto 1);
+--        end if;
+--        my_seed <= conv_integer(Qt);
+--     end process;
 
+
+--REFERENCE:  https://en.wikipedia.org/wiki/Linear_congruential_generator
+    Rand_num_gen: process(in_clock, rand_a, rand_c, rand_m, my_seed) IS
+    begin
+        IF rising_edge(in_clock) THEN
+            my_seed <= (rand_a*my_seed+rand_c) mod rand_m;
+        end if;
+    end process;
 
 --    -- Declare a process for computer move
-    Computer_Move: PROCESS (board_status, ai_pos, rand_seed, my_seed) IS
-    BEGIN
-        -- Seed the random number generator
-        -- 
-        rand_seed <= my_seed;
-        ai_pos <= 0;
+--    Computer_Move: PROCESS (board_status, ai_pos, rand_seed, my_seed) IS
+--    BEGIN
+--        -- Seed the random number generator
+--        -- 
+--        rand_seed <= my_seed;
+--        ai_pos <= 0;
     
-        -- Check if middle is available, choose it
-        IF board_status(5) = E THEN
-            ai_pos <= 5;
-        ELSE
-            -- Check if corners are available, choose one randomly
+--        -- Check if middle is available, choose it
+--        IF board_status(5) = E THEN
+--            ai_pos <= 5;
+--        ELSE
+--            -- Check if corners are available, choose one randomly
             
---            FIX THE CORNER SELECTION OFF AN ARRAY
+----            FIX THE CORNER SELECTION OFF AN ARRAY
             
-            ai_pos <= corner_array(rand_seed mod 4);
-            if ((board_status(ai_pos) /= E)) THEN
-                ai_pos <= corner_array((rand_seed mod 4)+1);
-                if ((board_status(ai_pos) /= E)) THEN
-                    ai_pos <= corner_array((rand_seed mod 4)+2);
-                    if ((board_status(ai_pos) /= E)) THEN
-                        ai_pos <= corner_array((rand_seed mod 4)+3);
-                    end if;
-                end if;
-            end if;
+--            ai_pos <= corner_array(rand_seed mod 4);
+--            if ((board_status(ai_pos) /= E)) THEN
+--                ai_pos <= corner_array((rand_seed mod 4)+1);
+--                if ((board_status(ai_pos) /= E)) THEN
+--                    ai_pos <= corner_array((rand_seed mod 4)+2);
+--                    if ((board_status(ai_pos) /= E)) THEN
+--                        ai_pos <= corner_array((rand_seed mod 4)+3);
+--                    end if;
+--                end if;
+--            end if;
             
             
             
-        END IF;
-    
-        -- Check win/defend condition
-        -- (1-3), (4-6), (7-9) rows
-        FOR i IN 1 TO 3 LOOP
-            IF (board_status(3*(i-1)+1) = board_status(3*(i-1)+2) AND board_status(3*(i-1)+1) /= E) OR
-               (board_status(3*(i-1)+2) = board_status(3*(i-1)+3) AND board_status(3*(i-1)+2) /= E) OR
-               (board_status(3*(i-1)+1) = board_status(3*(i-1)+3) AND board_status(3*(i-1)+1) /= E) THEN
-                -- Win or defend
-                IF board_status(3*(i-1)+1) = E THEN
-                    ai_pos <= 3*(i-1)+1;
-                ELSIF board_status(3*(i-1)+2) = E THEN
-                    ai_pos <= 3*(i-1)+2;
-                ELSIF board_status(3*(i-1)+3) = E THEN
-                    ai_pos <= 3*(i-1)+3;
-                END IF;
-                EXIT; -- Break out of loop if a move is found
-            END IF;
-        END LOOP;
-    
-        -- (1,4,7), (2,5,8), (3,6,9) columns
-        FOR i IN 1 TO 3 LOOP
-            IF (board_status(i) = board_status(i + 3) AND board_status(i) /= E) OR
-               (board_status(i + 3) = board_status(i + 6) AND board_status(i + 3) /= E) OR
-               (board_status(i) = board_status(i + 6) AND board_status(i) /= E) THEN
-                -- Win or defend
-                IF board_status(i) = E THEN
-                    ai_pos <= i;
-                ELSIF board_status(i + 3) = E THEN
-                    ai_pos <= i + 3;
-                ELSIF board_status(i + 6) = E THEN
-                    ai_pos <= i + 6;
-                END IF;
-                EXIT; -- Break out of loop if a move is found
-            END IF;
-        END LOOP;
-    
-        -- (1,5,9), (3,5,7) diagonals
-        IF (board_status(1) = board_status(5) AND board_status(1) /= E) OR
-           (board_status(5) = board_status(9) AND board_status(5) /= E) OR
-           (board_status(1) = board_status(9) AND board_status(1) /= E) THEN
-            -- Win or defend
-            IF board_status(1) = E THEN
-                ai_pos <= 1;
-            ELSIF board_status(5) = E THEN
-                ai_pos <= 5;
-            ELSE
-                ai_pos <= 9;
-            END IF;
-        ELSIF (board_status(3) = board_status(5) AND board_status(3) /= E) OR
-              (board_status(5) = board_status(7) AND board_status(5) /= E) OR
-              (board_status(3) = board_status(7) AND board_status(3) /= E) THEN
-            -- Win or defend
-            IF board_status(3) = E THEN
-                ai_pos <= 3;
-            ELSIF board_status(5) = E THEN
-                ai_pos <= 5;
-            ELSE
-                ai_pos <= 7;
-            END IF;
-        END IF;
-        
-        
-        
-    
---        IF NONE OF THESE WORKED THEN WE NEED TO JUST CHOOSE ONE OF THE REMAINING SPOTS
-        
-        ai_pos <= edge_array(rand_seed mod 4);
-            if ((board_status(ai_pos) /= E)) THEN
-                ai_pos <= edge_array((rand_seed mod 4)+1);
-                if ((board_status(ai_pos) /= E)) THEN
-                    ai_pos <= edge_array((rand_seed mod 4)+2);
-                    if ((board_status(ai_pos) /= E)) THEN
-                        ai_pos <= edge_array((rand_seed mod 4)+3);
-                    end if;
-                end if;
-            end if;
-    
-        -- Make the move
---        IF board_status(ai_pos) = E THEN
---            board_status(ai_pos) <= COMPUTER_LETTER;
 --        END IF;
     
-    END PROCESS Computer_Move;
+--        -- Check win/defend condition
+--        -- (1-3), (4-6), (7-9) rows
+--        FOR i IN 1 TO 3 LOOP
+--            IF (board_status(3*(i-1)+1) = board_status(3*(i-1)+2) AND board_status(3*(i-1)+1) /= E) OR
+--               (board_status(3*(i-1)+2) = board_status(3*(i-1)+3) AND board_status(3*(i-1)+2) /= E) OR
+--               (board_status(3*(i-1)+1) = board_status(3*(i-1)+3) AND board_status(3*(i-1)+1) /= E) THEN
+--                -- Win or defend
+--                IF board_status(3*(i-1)+1) = E THEN
+--                    ai_pos <= 3*(i-1)+1;
+--                ELSIF board_status(3*(i-1)+2) = E THEN
+--                    ai_pos <= 3*(i-1)+2;
+--                ELSIF board_status(3*(i-1)+3) = E THEN
+--                    ai_pos <= 3*(i-1)+3;
+--                END IF;
+--                EXIT; -- Break out of loop if a move is found
+--            END IF;
+--        END LOOP;
+    
+--        -- (1,4,7), (2,5,8), (3,6,9) columns
+--        FOR i IN 1 TO 3 LOOP
+--            IF (board_status(i) = board_status(i + 3) AND board_status(i) /= E) OR
+--               (board_status(i + 3) = board_status(i + 6) AND board_status(i + 3) /= E) OR
+--               (board_status(i) = board_status(i + 6) AND board_status(i) /= E) THEN
+--                -- Win or defend
+--                IF board_status(i) = E THEN
+--                    ai_pos <= i;
+--                ELSIF board_status(i + 3) = E THEN
+--                    ai_pos <= i + 3;
+--                ELSIF board_status(i + 6) = E THEN
+--                    ai_pos <= i + 6;
+--                END IF;
+--                EXIT; -- Break out of loop if a move is found
+--            END IF;
+--        END LOOP;
+    
+--        -- (1,5,9), (3,5,7) diagonals
+--        IF (board_status(1) = board_status(5) AND board_status(1) /= E) OR
+--           (board_status(5) = board_status(9) AND board_status(5) /= E) OR
+--           (board_status(1) = board_status(9) AND board_status(1) /= E) THEN
+--            -- Win or defend
+--            IF board_status(1) = E THEN
+--                ai_pos <= 1;
+--            ELSIF board_status(5) = E THEN
+--                ai_pos <= 5;
+--            ELSIF board_status(9) = E THEN
+--                ai_pos <= 9;
+--            END IF;
+--        ELSIF (board_status(3) = board_status(5) AND board_status(3) /= E) OR
+--              (board_status(5) = board_status(7) AND board_status(5) /= E) OR
+--              (board_status(3) = board_status(7) AND board_status(3) /= E) THEN
+--            -- Win or defend
+--            IF board_status(3) = E THEN
+--                ai_pos <= 3;
+--            ELSIF board_status(5) = E THEN
+--                ai_pos <= 5;
+--            ELSIF board_status(7) = E THEN
+--                ai_pos <= 7;
+--            END IF;
+--        END IF;
+        
+        
+        
+    
+----        IF NONE OF THESE WORKED THEN WE NEED TO JUST CHOOSE ONE OF THE REMAINING SPOTS
+        
+--        ai_pos <= edge_array(rand_seed mod 4);
+--            if ((board_status(ai_pos) /= E)) THEN
+--                ai_pos <= edge_array((rand_seed mod 4)+1);
+--                if ((board_status(ai_pos) /= E)) THEN
+--                    ai_pos <= edge_array((rand_seed mod 4)+2);
+--                    if ((board_status(ai_pos) /= E)) THEN
+--                        ai_pos <= edge_array((rand_seed mod 4)+3);
+--                    end if;
+--                end if;
+--            end if;
+    
+--        -- Make the move
+----        IF board_status(ai_pos) = E THEN
+----            board_status(ai_pos) <= COMPUTER_LETTER;
+----        END IF;
+    
+--    END PROCESS Computer_Move;
 
+    Computer_Move: PROCESS (board_status, blink_counter) IS
+    begin
+        IF (blink_counter(25)= '0') THEN
+            if board_status(1) = E THEN
+                ai_pos <= 1;
+            elsif board_status(2) = E THEN
+                ai_pos <= 2;
+            elsif board_status(3) = E THEN
+                ai_pos <= 3;
+            elsif board_status(4) = E THEN
+                ai_pos <= 4;
+            elsif board_status(5) = E THEN
+                ai_pos <= 5;
+            elsif board_status(6) = E THEN
+                ai_pos <= 6;
+            elsif board_status(7) = E THEN
+                ai_pos <= 7;
+            elsif board_status(8) = E THEN
+                ai_pos <= 8;
+            elsif board_status(9) = E THEN
+                ai_pos <= 9;
+            end if;
+        end if;
+    end process;
         
 END Behavioral;
