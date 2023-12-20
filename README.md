@@ -34,12 +34,14 @@ Connections of the processes on the inside of game_board.vhd
 * b_resetter: sets the signal in charge of resetting the game based on if the user pressed one of the two reset buttons
 * b_COMPUTER_SELECT: states if the user decided to reset to play against another player or against the computer
 * b_win_check: if the game is running, checks if there is a win on the board, and which cells constitute the win (there can be multiple simultaneous wins); resets all check signals to 0 when reset is selected
-* 
+* b_flip_player: switches which symbol is currently being played
+* Rand_num_gen: generates a pseudorandom number
+* smart_Computer_Move: computer move selection logic; prioritizes blocking a player win or creating a computer win, then if that is not available prioritize center, then corner, then edge
 
-
-
-
-note: There is another process called "b_is_finished" that was used during testing that updates a signal only used in a sensitivity list. We did not remove it to make sure we did not introduce any random glitches into the code.
+Notes:
+* There is another process called "b_is_finished" that was used during testing that updates a signal only used in a sensitivity list. We did not remove it to make sure we did not introduce any random glitches into the code.
+* There are two other computer codes included in comments: "rand_Computer_Move" and "dumb_Computer_Move". The user can attempt to use these for different computer playstyles. Note that "rand_Computer_Move" is glitchy and would need to be modified.
+* The process "smart_Computer_Move" contains commented code that uses for loops to make the selections for blocking or winning. Vivado did not react as expected to this code, which is why it was replaced with hard coding in all blocking or win conditions.
 
 ## 2. Modifications
  * Utilized Lab 3 as the base framework for the game.
