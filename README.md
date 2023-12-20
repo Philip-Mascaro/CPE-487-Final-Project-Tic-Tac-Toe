@@ -14,7 +14,7 @@ Connections of the diferent files:
 
 ![Block Diagram for how the files work together](/Images/487_Block_Diagram.jpg)
 
-Connections of the processes on the inside of game_board.vhd:
+Connections of the processes on the inside of game_board.vhd :
 
 ![Block Diagram for how the Processes work together](/Images/487_Block_Diagram_Processes.jpg)
 
