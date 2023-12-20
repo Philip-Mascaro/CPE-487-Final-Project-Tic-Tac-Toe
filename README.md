@@ -64,4 +64,7 @@
 * Tie condition was having mutliple errors including having the "O" signals appearing white in the display when they should have been black
 ntation with all components.
 * All of the VHDL random number generators we found either only worked in testbench or gave errors in Vivado. Eventually, we ended up using a random number generator with our own seed number (487) and we could not use it for our computer.
-*  Issues with delay in the Computer Mode. Computer will sometimes play multiple times in a turn. It would also play a move even after losing causing a double win because it would move faster than the win signal.
+*  Issues with delay in the Computer Mode. Computer will sometimes play multiple times in a turn. Player could sometimes play alone. It would also play a move even after losing causing a double win because it would move faster than the win signal.
+*  Holding the reset button for a while could potentially result in both players getting the same symbol.
+### Potential Future Actions
+* One idea we had after finishing the project would be to slow down the speed of the randomizer's clock for how often the random seed gets updated. This could potentially help with the issue where both players get the same symbol if the reset button is held for too long.
