@@ -25,6 +25,15 @@ Connections of the processes on the inside of game_board.vhd
 * update_board_process: sets the player order upon reset; during the game will update the board based on valid cell selections (by player or computer) and switch which player is active
 * bdraw: states if a pixel is on or not based on if the board cell is an X, an O, or Empty; repeats the process for the attempted move and states if it is an attempted pixel on; also sets a signal if the pixel is in the top left 50x50 of the screen
 * b_set_board: states which color each pixel should be based on if the game is running, if there is a win or a tie, and if there is an attempted move being played at that spot (note that the top left 50x50 of the screen is set to the parity of the computer's next attempt)
+* (color swapping): not a process, but updates the pixel coloration based on which color signal the pixel is (8 color options only)
+* b_integer: converts user selection on keypad to an integer
+* b_counter: updates a counter that controls the blinking of the attempted move and updates when the computer can lock in its move
+* b_am_i_a_winner: checks if the current pixel is both one that is part of a symbol on the board (and which cell that symbol is in), and is also part of the winning set of cells
+* b_update_test: sets the current attempted position if the user has selected a value 1-9 on the keypad
+* b_attempt: states if the current move the player is trying to make is valid or not (controls the color of the blinking symbol)
+* b_resetter: sets the signal in charge of resetting the game based on if the user pressed one of the two reset buttons
+* b_COMPUTER_SELECT: states if the user decided to reset to play against another player or against the computer
+* b_win_check: if the game is running, checks if there is a win on the board, and which cells constitute the win (there can be multiple simultaneous wins); resets all check signals to 0 when reset is selected
 * 
 
 
