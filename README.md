@@ -50,7 +50,7 @@
 * Jett Tinik worked on adding in the ability for players to confirm their moves, the ability to switch between the two players, and the computer opponent.
 * Jeffrey Tharakan created the win conditions and the ability for players to reset the game and choose whether they want to do a player versus player game or a player versus computer game.
 ### Timeline
-* Week 1: create the graphical display
+* Week 1: create the graphical display, made a google doc to divvy up the work and keep track of code
 * Week 2: add in move selection and confirmation
 * Week 3: add in win conditions and the ability to reset the game 
 * Week 4: Fix issues with tie condition and add in computer opponent for player versus computer mode
