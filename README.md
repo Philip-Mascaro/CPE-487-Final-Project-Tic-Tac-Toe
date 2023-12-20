@@ -17,13 +17,13 @@
  * Utilized the keypad.vhdl file from Lab 4 and placed the keypad module in the vga_top.
  * Randomizer Code with seed [random number logic ](https://en.wikipedia.org/wiki/Linear_congruential_generator)
  * For the computer turn-based moves we just started from general game logic. What are commonly used strategies when playing and how to react to winning situations when they arise? After considering these we wrote this sudo code. Once the syntax is solid we set the move location determined by the logic to a signal to be dealt with for move confirmation.
-  * If the middle is open take it
-  * If not go for the corners
-  * If there are two letters in any section with a space (win check)
-  * Move there (Block or win that section)
-  * Elsif plays a random move
+   * If the middle is open take it
+   * If not go for the corners
+   * If there are two letters in any section with a space (win check)
+   * Move there (Block or win that section)
+   * Elsif plays a random move
 * Switched to the dumb computer after issues with the randomizer happening to fast
-  * Randomizer still used for who plays first
+   * Randomizer still used for who plays first
 * X and O pixel logic [desmos link for drawing X and O](https://www.desmos.com/calculator/irfxf6ciac)
 
 ## 3. Summary of Steps
